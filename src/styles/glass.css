@@ -1,0 +1,141 @@
+/* ═════════ Optical liquid glass ═════════
+   Layers, bottom to top:
+   1. backdrop: refracted through the per-element SVG displacement map (Chromium), or frosted blur (fallback)
+   2. body: a thin milky fill, brighter toward the light (top-left)
+   3. convex shading: inner highlights and a soft inner edge glow (inset shadows)
+   4. .lg-rim: a Fresnel rim, bright on the lit side and the opposite inner edge, turning with the cursor
+   5. .lg-spec: a gloss lobe at the top plus a soft specular highlight that follows the pointer
+   Content sits above all of it and is never filtered, so text stays sharp. */
+.lg {
+  --lg-body: linear-gradient(165deg, rgba(255, 255, 255, 0.46) 0%, rgba(255, 255, 255, 0.2) 55%, rgba(255, 255, 255, 0.3) 100%);
+  --lg-rim-a: 0.95;
+  --lg-shadow: 0 1px 2px rgba(20, 30, 40, 0.06), 0 10px 28px -10px rgba(20, 34, 46, 0.28), 0 30px 60px -34px rgba(10, 40, 66, 0.3);
+  position: relative; isolation: isolate;
+  background: var(--lg-body);
+  -webkit-backdrop-filter: blur(16px) saturate(165%) brightness(1.04);
+  backdrop-filter: blur(16px) saturate(165%) brightness(1.04);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.85),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.3),
+    inset 0 0 14px rgba(255, 255, 255, 0.22),
+    inset 0 -12px 24px -18px rgba(10, 111, 165, 0.16),
+    var(--lg-shadow);
+  border: 0;
+  transition: box-shadow 0.5s var(--ease-out), transform 0.55s var(--ease-liquid), background 0.5s;
+}
+/* With refraction the background itself shows through the lens, so the body can stay light */
+.lg--refract {
+  -webkit-backdrop-filter: var(--lg-filter) brightness(1.05);
+  backdrop-filter: var(--lg-filter) brightness(1.05);
+}
+.lg-rim, .lg-spec { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: -1; }
+.lg-rim {
+  padding: 1.25px;
+  background: conic-gradient(from var(--la),
+    rgba(255, 255, 255, var(--lg-rim-a)) 0deg, rgba(255, 255, 255, 0.18) 55deg, rgba(255, 255, 255, 0.04) 120deg,
+    rgba(255, 255, 255, 0.55) 180deg, rgba(255, 255, 255, 0.08) 240deg, rgba(255, 255, 255, 0.2) 300deg, rgba(255, 255, 255, var(--lg-rim-a)) 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  transition: --la 0.8s var(--ease-out);
+}
+.lg-spec {
+  background:
+    radial-gradient(240px circle at var(--gx, 30%) var(--gy, -30%), rgba(255, 255, 255, 0.3), transparent 62%),
+    radial-gradient(120% 70% at 18% -8%, rgba(255, 255, 255, 0.38), transparent 52%);
+  mix-blend-mode: screen; opacity: 0.8; transition: opacity 0.5s;
+}
+@property --la { syntax: '<angle>'; initial-value: 135deg; inherits: true; }
+
+/* Grades */
+.lg--clear { --lg-body: linear-gradient(165deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.12) 60%, rgba(255, 255, 255, 0.22) 100%); }
+.lg--tint {
+  --lg-body: linear-gradient(165deg, rgba(240, 248, 253, 0.56) 0%, rgba(214, 235, 247, 0.28) 60%, rgba(234, 244, 250, 0.4) 100%);
+  box-shadow: inset 0 1px 1px #fff, inset 0 -1px 1px rgba(255, 255, 255, 0.35), inset 0 0 16px rgba(255, 255, 255, 0.28), inset 0 -16px 28px -18px rgba(10, 111, 165, 0.28), var(--lg-shadow);
+}
+.lg--frost { --lg-body: linear-gradient(165deg, rgba(255, 255, 255, 0.62) 0%, rgba(250, 252, 253, 0.42) 55%, rgba(255, 255, 255, 0.5) 100%); }
+.lg--dark {
+  --lg-body: linear-gradient(165deg, rgba(44, 51, 58, 0.5) 0%, rgba(18, 22, 26, 0.38) 60%, rgba(30, 36, 42, 0.46) 100%);
+  --lg-rim-a: 0.5;
+  --lg-shadow: 0 26px 60px -30px rgba(0, 0, 0, 0.7);
+  color: rgba(255, 255, 255, 0.9);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.22), inset 0 0 18px rgba(255, 255, 255, 0.05), inset 0 -18px 30px -20px rgba(111, 169, 203, 0.22), var(--lg-shadow);
+}
+.lg--dark .lg-spec { opacity: 0.35; }
+/* Frosted fallback (no SVG backdrop filters): denser body so text keeps its contrast */
+html:not(.lg-refract) .lg--clear { --lg-body: linear-gradient(165deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.42)); }
+html:not(.lg-refract) .lg--frost { --lg-body: linear-gradient(165deg, rgba(255, 255, 255, 0.78), rgba(250, 252, 253, 0.6)); }
+html:not(.lg-refract) .lg--dark { --lg-body: linear-gradient(165deg, rgba(38, 44, 50, 0.72), rgba(18, 21, 24, 0.6)); }
+@media (prefers-reduced-transparency: reduce) {
+  .lg { --lg-body: rgba(255, 255, 255, 0.94) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+  .lg--dark { --lg-body: rgba(24, 28, 32, 0.95) !important; }
+}
+
+/* ───────── Where the material is used ───────── */
+/* Navigation bar */
+/* Floating glass bar. At the top it is nearly clear; once the page scrolls under it the body gains
+   a little density (still refracting). Over the dark chapters of the processor story it turns into
+   dark glass with light text, so it stays legible on both light and dark scenes. */
+.nav-bar.lg {
+  border-radius: 22px;
+  --lg-body: linear-gradient(165deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.16) 60%, rgba(255, 255, 255, 0.28) 100%);
+  transition: background 0.5s var(--ease-out), box-shadow 0.5s var(--ease-out), color 0.4s;
+}
+.nav.is-scrolled .nav-bar.lg { --lg-body: linear-gradient(165deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.36) 60%, rgba(255, 255, 255, 0.48) 100%); }
+html:not(.lg-refract) .nav-bar.lg { --lg-body: rgba(255, 255, 255, 0.72); }
+html:not(.lg-refract) .nav.is-scrolled .nav-bar.lg { --lg-body: rgba(255, 255, 255, 0.86); }
+html.nav-on-dark .nav-bar.lg {
+  --lg-body: linear-gradient(165deg, rgba(44, 51, 58, 0.52) 0%, rgba(16, 19, 22, 0.36) 60%, rgba(30, 36, 42, 0.46) 100%);
+  --lg-rim-a: 0.55;
+  color: var(--white);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), inset 0 0 16px rgba(255, 255, 255, 0.05), inset 0 -16px 28px -20px rgba(111, 169, 203, 0.24), 0 22px 50px -26px rgba(0, 0, 0, 0.7);
+}
+html.nav-on-dark .nav-bar > .lg-spec { opacity: 0.35; }
+html.nav-on-dark .brand, html.nav-on-dark .nav-link:hover, html.nav-on-dark .nav-item.is-open > .nav-link { color: var(--white); }
+html.nav-on-dark .nav-link { color: rgba(255, 255, 255, 0.78); }
+html.nav-on-dark .nav-link.is-current { color: var(--blue-300); }
+html.nav-on-dark .nav-link.is-current::after { background: var(--blue-300); }
+html.nav-on-dark .nav-blob { background: rgba(255, 255, 255, 0.12); }
+html.nav-on-dark .brand-divider { background: rgba(255, 255, 255, 0.2); }
+html.nav-on-dark .brand-ieee { mix-blend-mode: normal; background: var(--white); border-radius: 6px; padding: 2px 4px; }
+html.nav-on-dark .nav-burger { background: rgba(255, 255, 255, 0.12); }
+html.nav-on-dark .nav-burger-lines i { background: var(--white); }
+html:not(.lg-refract).nav-on-dark .nav-bar.lg { --lg-body: rgba(24, 28, 32, 0.82); }
+/* Floating register control */
+.float-cta-inner.lg { display: flex; align-items: center; gap: 16px; padding: 6px 6px 6px 22px; border-radius: 999px; }
+.float-cta-meta { color: var(--graphite); font-weight: 500; }
+.float-cta-meta strong { color: var(--ink); }
+/* Hero badge, countdown, scroll cue */
+.hero-badge.lg { border-radius: 999px; }
+.hero-count.lg { border-radius: 30px; }
+
+/* Chapter panels and the venue card */
+.ch-panel.lg { border-radius: 34px; }
+.venue-card.lg { border-radius: 30px; max-width: 500px; padding: 26px 28px; display: grid; gap: 8px; }
+
+/* Glass button: a convex clear capsule that brightens on hover and presses down */
+.lbtn--glass .lq-glass { position: absolute; inset: 0; z-index: -1; border-radius: inherit; transition: transform 0.45s var(--ease-liquid); }
+.lbtn--glass:hover .lq-glass .lg-spec { opacity: 1; }
+.lbtn--glass:hover { color: var(--ink); }
+.lbtn--glass:active .lq-glass { transform: scale(0.96); }
+.lbtn--glass::before { display: none; }
+/* Primary button reads as a convex tinted capsule */
+.lbtn--primary .lq, .lbtn--light .lq {
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5), inset 0 -3px 6px -2px rgba(0, 20, 40, 0.28), inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+.lbtn--primary .lq::before {
+  content: ''; position: absolute; left: 8%; right: 8%; top: 1px; height: 46%; border-radius: 999px; z-index: 2;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0)); pointer-events: none;
+}
+
+/* Liquid morph for dropdowns: emerges from a compressed capsule while its content resolves from blur */
+.drop.lg {
+  transform-origin: 50% 0; border-radius: 22px;
+  transform: translate(-50%, 4px) scale(0.86, 0.55);
+  transition: opacity 0.28s, transform 0.55s var(--ease-liquid), visibility 0.3s, border-radius 0.55s var(--ease-out);
+}
+.nav-item:not(.is-open) .drop.lg { border-radius: 999px; }
+
+.nav-item.is-open .drop.lg { transform: translate(-50%, 0) scale(1); }
+
+/* Dropdowns sit over any scene (including the dark processor stage): denser frost for legible text */
+.drop.lg { --lg-body: linear-gradient(165deg, rgba(255, 255, 255, 0.92) 0%, rgba(250, 252, 253, 0.84) 100%); }
