@@ -43,7 +43,7 @@ To add a page: create `<name>.html` (copy an existing one and change `data-page`
 ## Still to connect
 
 - `links.registrationForm` in `src/data/conference.ts`: the Google Form URL (none supplied yet). Optionally set `links.registrationFormFields` to the form's pre-fill ids so the Full Name and Mobile Number from the Registration page carry over.
-- Committee portraits: only members with a supplied photo show one (2 committee portraits, plus 8 members who are also published guests). The rest show a monogram placeholder until approved photos are supplied.
+- Committee portraits: 30 members have a photo (2 supplied, 20 from mjcollege.ac.in, see `docs/committee-photo-sources.md`, and 8 reused guest portraits). Members from other institutions show a monogram placeholder until approved photos are supplied.
 - Guest consent for portraits, larger originals for the low-resolution ones, and photos for Dr. Abhishek Ranjan and Prof. Krishna Reddy P. (see `docs/guest-image-sources.md`).
 - The open items in `docs/content-verification.md`.
 - The processor is a procedural model (no external GLB). A licensed GLB can replace `Processor.tsx` if preferred.

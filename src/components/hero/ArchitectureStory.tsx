@@ -44,7 +44,7 @@ function TrackChapter({ t }: { t: Track }) {
     <>
       <div className="ch-head">
         <span className="ch-ico"><TrackIcon kind={t.icon} /></span>
-        <p className="ch-kicker">Track {t.no} · {t.topics.length} research areas</p>
+        <p className="ch-kicker">Track {t.no}</p>
       </div>
       <h2 className="ch-title" data-blur-reveal="">{t.title}</h2>
       <p className="ch-text">{t.summary}</p>
@@ -53,7 +53,7 @@ function TrackChapter({ t }: { t: Track }) {
       </div>
       <div className="ch-actions">
         <button className="more-btn" type="button" aria-expanded={open} aria-controls={`topics-${t.no}`} onClick={() => { setOpen((o) => !o); setTimeout(() => ScrollTrigger.refresh(), 650); }}>
-          {open ? 'Hide research areas' : `Show all ${t.topics.length} research areas`}
+          {open ? 'Hide research areas' : 'Show all research areas'}
         </button>
         <a className="link-arrow" href={href('cfp', 'track-' + t.no)}>Call for papers →</a>
       </div>

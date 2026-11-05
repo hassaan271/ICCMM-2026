@@ -81,8 +81,7 @@ export function Committee() {
             <GlassPanel kind="light" as="label" className="search" data-reveal="">
               <span className="visually-hidden">Filter organizing committee by name</span>
               <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.5" /><path d="m16 16 4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
-              <input type="search" placeholder={`Search ${organizingCommittee.length} members`} value={q} onChange={(e) => setQ(e.target.value)} autoComplete="off" />
-              <span className="search-count" aria-live="polite">{matches.length}</span>
+              <input type="search" placeholder="Search members" value={q} onChange={(e) => setQ(e.target.value)} autoComplete="off" />
             </GlassPanel>
           </div>
           <ul className="org-grid">{matches.map((n) => <li key={n}><Highlight text={n} q={query} /></li>)}</ul>

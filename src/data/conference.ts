@@ -462,6 +462,28 @@ export const aboutShort =
 export const portraits = {
   'Syed Ferhathullah Hussainy': 'assets/images/portrait-syed-ferhathullah-hussainy.webp',
   'Mohd. Hamraj': 'assets/images/portrait-mohd-hamraj.webp',
+  // From the official MJCET website (mjcollege.ac.in): the Principal page and the department faculty lists.
+  // Each was matched by name and department, then cropped to a 256 px square. See docs/committee-photo-sources.md.
+  'S. Srinivasa Rao': 'assets/images/committee/s-srinivasa-rao.webp',
+  'Tasneem Bano Rehman': 'assets/images/committee/tasneem-bano-rehman.webp',
+  'Ayesha Naaz': 'assets/images/committee/ayesha-naaz.webp',
+  'G. Sailaja': 'assets/images/committee/g-sailaja.webp',
+  'Syed Shabbeer Ahmed': 'assets/images/committee/syed-shabbeer-ahmed.webp',
+  'Viquar Mohiuddin': 'assets/images/committee/viquar-mohiuddin.webp',
+  'Sabir Hussain': 'assets/images/committee/sabir-hussain.webp',
+  'Ishrat Meera Mirzana': 'assets/images/committee/ishrat-meera-mirzana.webp',
+  'Maniza Hijab': 'assets/images/committee/maniza-hijab.webp',
+  'Nazeerunissa': 'assets/images/committee/nazeerunissa.webp',
+  'Arshad Mohammed': 'assets/images/committee/arshad-mohammed.webp',
+  'Gouri R Patil': 'assets/images/committee/gouri-r-patil.webp',
+  'Irfan Sadaq': 'assets/images/committee/irfan-sadaq.webp',
+  'M A Raheem': 'assets/images/committee/m-a-raheem.webp',
+  'Fahmina Taranum': 'assets/images/committee/fahmina-taranum.webp',
+  'Nazia Parveen': 'assets/images/committee/nazia-parveen.webp',
+  'Hashim Ali': 'assets/images/committee/hashim-ali.webp',
+  'Iftekharuddin': 'assets/images/committee/iftekharuddin.webp',
+  'Sayyada Hajera Begum': 'assets/images/committee/sayyada-hajera-begum.webp',
+  'Uma Dulhare': 'assets/images/committee/uma-dulhare.webp',
 };
 
 // Committee members who are also published ICCMM-26 guests (same name and institution in both sources).

@@ -49,7 +49,7 @@ export function CallForPapers() {
               <GlassPanel kind="light" as="article" className="cfp-track" id={`track-${t.no}`} key={t.no} data-reveal="">
                 <header className="cfp-track-head">
                   <span className="cfp-track-ico"><TrackIcon kind={t.icon} /></span>
-                  <div><p className="label">Track {Number(t.no)} · {t.topics.length} research areas</p><h3 className="cfp-track-title">{t.title}</h3></div>
+                  <div><p className="label">Track {Number(t.no)}</p><h3 className="cfp-track-title">{t.title}</h3></div>
                 </header>
                 <ul className="cfp-topics">{t.topics.map((x) => <li key={x}>{x}</li>)}</ul>
               </GlassPanel>

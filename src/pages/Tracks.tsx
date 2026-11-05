@@ -42,7 +42,7 @@ export function Tracks() {
                   <p className="lead" data-reveal="">{t.summary}</p>
                   <div className="trk-grid">
                     <div data-reveal="">
-                      <h3 className="h3">Research areas <span className="muted">({t.topics.length})</span></h3>
+                      <h3 className="h3">Research areas</h3>
                       <ul className="trk-topics">{t.topics.map((x) => <li key={x}>{x}</li>)}</ul>
                     </div>
                     <div data-reveal="">
