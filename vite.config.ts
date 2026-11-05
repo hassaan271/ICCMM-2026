@@ -7,14 +7,13 @@ import { readFileSync } from 'node:fs';
 const pages = ['index', 'about', 'tracks', 'speakers', 'guests', 'programme', 'call-for-papers', 'registration', 'committee', 'events', 'sponsors', 'venue'];
 
 // Injects the loading screen into every page so it paints before the bundle loads.
-// A tiny head script skips it on later page views in the same browser session.
+// It shows on every page load and leaves once the page is ready.
 function bootScreen(): Plugin {
   const file = resolve(import.meta.dirname, 'src/components/loading/boot-screen.html');
   return {
     name: 'iccmm-boot-screen',
     transformIndexHtml() {
       return [
-        { tag: 'script', injectTo: 'head-prepend', children: "try{if(sessionStorage.getItem('iccmm-boot'))document.documentElement.classList.add('boot-skip')}catch(e){}" },
         { tag: 'div', injectTo: 'body-prepend', attrs: { 'data-boot': '' }, children: readFileSync(file, 'utf8') },
       ];
     },

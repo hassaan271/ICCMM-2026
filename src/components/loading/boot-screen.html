@@ -1,94 +1,157 @@
-<!-- ICCMM-26 loading screen. Injected into every page by the bootScreen() plugin in vite.config.ts,
-     so it paints before the app bundle arrives. Shown once per browser session (sessionStorage). -->
+<!-- ICCMM-26 loading screen. Injected into every page by the bootScreen() plugin in vite.config.ts, so it
+     paints before the app bundle arrives. Shown on every page load until the page is ready.
+     The processor assembles layer by layer as real loading milestones complete (the same exploded stack
+     the homepage 3D model uses), then the screen lifts away and the hero intro plays. -->
 <style>
-  #boot { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; background: #f7f9fa; color: #14181c;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif; overflow: hidden;
-    clip-path: inset(0 0 0 0); transition: clip-path 0.9s cubic-bezier(0.65, 0, 0.35, 1), visibility 0s linear 0.9s; }
-  html.no-js #boot, html.boot-skip #boot { display: none; }
+  #boot { --p: 0; position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; overflow: hidden; color: #14181c;
+    background: #f7f9fa; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    clip-path: inset(0 0 0 0); transition: clip-path 1s cubic-bezier(0.76, 0, 0.24, 1), visibility 0s linear 1s; }
+  html.no-js #boot { display: none; }
   html.is-booting, html.is-booting body { overflow: hidden; }
   #boot.is-out { clip-path: inset(0 0 100% 0); visibility: hidden; }
-  .boot-bg { position: absolute; inset: 0; background: radial-gradient(60% 55% at 50% 42%, #e3f0f8 0%, rgba(234, 244, 250, 0) 70%); }
-  .boot-grid { position: absolute; inset: -64px; background-image: linear-gradient(rgba(10, 111, 165, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(10, 111, 165, 0.07) 1px, transparent 1px);
-    background-size: 64px 64px; -webkit-mask-image: radial-gradient(50% 50% at 50% 45%, #000, transparent 78%); mask-image: radial-gradient(50% 50% at 50% 45%, #000, transparent 78%); }
-  .boot-core { position: relative; display: grid; justify-items: center; gap: 0; padding: 24px; text-align: center; width: min(560px, 100%);
-    transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s; }
-  #boot.is-out .boot-core { transform: translateY(-40px) scale(0.97); opacity: 0; }
-  .boot-chip { width: clamp(150px, 34vw, 210px); height: auto; overflow: visible; margin-bottom: 30px; }
-  .boot-chip .pkg { fill: #fff; stroke: rgba(20, 24, 28, 0.14); stroke-width: 1; filter: drop-shadow(0 18px 30px rgba(10, 60, 100, 0.16)); }
-  .boot-chip .die { fill: url(#bootDie); }
-  .boot-chip .die-line { stroke: rgba(255, 255, 255, 0.35); stroke-width: 0.6; }
-  .boot-chip .pin { stroke: #b9c2ca; stroke-width: 2.4; stroke-linecap: round; }
-  .boot-chip .trace { fill: none; stroke: rgba(10, 111, 165, 0.22); stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
-  .boot-chip .pulse { fill: none; stroke: #0a6fa5; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 0.08 1; stroke-dashoffset: 1.08; animation: bootPulse 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
-  .boot-chip .pulse:nth-of-type(2n) { animation-delay: -0.8s; }
-  .boot-chip .pulse:nth-of-type(3n) { animation-delay: -1.6s; }
-  .boot-chip .node { fill: #fff; stroke: #0a6fa5; stroke-width: 1.2; }
-  .boot-chip .glint { fill: url(#bootGlint); animation: bootGlint 2.8s ease-in-out infinite; transform-box: fill-box; }
-  .boot-chip .core-dot { fill: #fff; animation: bootBeat 1.6s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
-  .boot-acr { display: inline-flex; font-size: clamp(2.6rem, 9vw, 4.2rem); font-weight: 800; letter-spacing: -0.05em; line-height: 0.95; margin: 0 0 10px; }
-  .boot-acr span { display: inline-block; opacity: 0; transform: translateY(60%); filter: blur(8px); animation: bootIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards; animation-delay: calc(0.12s + var(--i) * 0.05s); }
+
+  /* Backdrop: soft IEEE-blue light, engineering grid, slow drifting glow */
+  .boot-bg { position: absolute; inset: 0; background: radial-gradient(55% 50% at 50% 40%, #e1eff8 0%, rgba(234, 244, 250, 0) 72%), linear-gradient(180deg, #fbfcfd, #f3f6f8); }
+  .boot-grid { position: absolute; inset: -64px; background-image: linear-gradient(rgba(10, 111, 165, 0.065) 1px, transparent 1px), linear-gradient(90deg, rgba(10, 111, 165, 0.065) 1px, transparent 1px);
+    background-size: 64px 64px; -webkit-mask-image: radial-gradient(48% 48% at 50% 42%, #000, transparent 80%); mask-image: radial-gradient(48% 48% at 50% 42%, #000, transparent 80%);
+    animation: bootGrid 14s linear infinite; }
+  .boot-orb { position: absolute; width: 46vmax; height: 46vmax; border-radius: 50%; filter: blur(60px); opacity: 0.55; background: radial-gradient(circle, rgba(111, 169, 203, 0.45), transparent 65%); }
+  .boot-orb--a { left: -12vmax; top: -14vmax; animation: bootDrift 16s ease-in-out infinite alternate; }
+  .boot-orb--b { right: -14vmax; bottom: -18vmax; animation: bootDrift 19s ease-in-out -6s infinite alternate-reverse; }
+
+  .boot-core { position: relative; display: grid; justify-items: center; padding: 24px; width: min(560px, 100%); text-align: center;
+    transition: transform 1s cubic-bezier(0.76, 0, 0.24, 1), opacity 0.7s ease; }
+  #boot.is-out .boot-core { transform: translateY(-56px) scale(0.96); opacity: 0; }
+
+  /* Isometric processor: substrate → interconnect → silicon die → heat spreader */
+  .boot-chip { width: clamp(200px, 46vw, 290px); height: auto; overflow: visible; margin-bottom: 6px; animation: bootFloat 5s ease-in-out infinite; }
+  .boot-chip .L { transition: transform 1.1s cubic-bezier(0.16, 1, 0.3, 1); }
+  .boot-chip .L-sub { transform: translateY(calc(clamp(0, 1 - var(--p) * 2, 1) * 38px)); }
+  .boot-chip .L-rdl { transform: translateY(calc(clamp(0, 1 - var(--p) * 1.5, 1) * -8px)); }
+  .boot-chip .L-die { transform: translateY(calc(clamp(0, 1 - var(--p) * 1.2, 1) * -48px)); }
+  .boot-chip .L-ihs { transform: translateY(calc(clamp(0, 1 - var(--p), 1) * -98px)); }
+  .boot-chip .shadow { transform-origin: 150px 272px; transform: scale(calc(0.86 + var(--p) * 0.14)); opacity: calc(0.5 + var(--p) * 0.3); transition: transform 1.1s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.1s; }
+  .boot-chip .trace { stroke-dasharray: 1; stroke-dashoffset: 1; animation: bootDraw 2.6s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
+  .boot-chip .trace:nth-of-type(2n) { animation-delay: -0.9s; }
+  .boot-chip .trace:nth-of-type(3n) { animation-delay: -1.7s; }
+  .boot-chip .core { animation: bootBeat 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  .boot-chip .sweep { opacity: 0; }
+  #boot.is-ready .boot-chip .sweep { animation: bootSweep 0.9s cubic-bezier(0.65, 0, 0.35, 1) forwards; }
+  #boot.is-ready .boot-chip .halo { opacity: 1; }
+  .boot-chip .halo { opacity: 0; transition: opacity 0.6s ease; }
+
+  .boot-acr { display: inline-flex; margin: 0 0 8px; font-size: clamp(2.6rem, 9vw, 4.2rem); font-weight: 800; letter-spacing: -0.055em; line-height: 0.95; }
+  .boot-acr span { display: inline-block; opacity: 0; transform: translateY(60%); filter: blur(8px); animation: bootIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards; animation-delay: calc(0.1s + var(--i) * 0.05s); }
   .boot-acr .dash { color: #0a6fa5; }
-  .boot-sub { margin: 0 0 30px; font-size: 0.95rem; color: #3a4148; letter-spacing: -0.005em; opacity: 0; animation: bootFade 0.9s ease 0.55s forwards; }
-  .boot-sub em { font-family: 'Instrument Serif', Georgia, serif; font-size: 1.12em; color: #0a6fa5; }
-  .boot-meter { display: grid; gap: 10px; width: min(300px, 80vw); padding: 14px 16px 12px; border-radius: 18px; opacity: 0; animation: bootFade 0.8s ease 0.75s forwards;
-    background: linear-gradient(165deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.5)); -webkit-backdrop-filter: blur(14px) saturate(160%); backdrop-filter: blur(14px) saturate(160%);
+  .boot-sub { margin: 0 0 4px; font-size: clamp(0.92rem, 2.4vw, 1.02rem); font-weight: 600; color: #14181c; letter-spacing: -0.01em; opacity: 0; animation: bootFade 0.9s ease 0.45s forwards; }
+  .boot-sub { text-wrap: balance; }
+  .boot-sub em { font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-weight: 400; font-size: 1.14em; color: #0a6fa5; white-space: nowrap; }
+  .boot-meta { margin: 0 0 26px; font-size: 0.88rem; color: #58626b; opacity: 0; animation: bootFade 0.9s ease 0.6s forwards; }
+
+  /* Liquid-glass progress pill */
+  .boot-meter { display: grid; gap: 10px; width: min(300px, 82vw); padding: 14px 16px 12px; border-radius: 18px; opacity: 0; animation: bootFade 0.8s ease 0.75s forwards;
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.5)); -webkit-backdrop-filter: blur(14px) saturate(160%); backdrop-filter: blur(14px) saturate(160%);
     box-shadow: inset 0 1px 1px #fff, inset 0 0 0 1px rgba(20, 24, 28, 0.06), 0 14px 34px -18px rgba(10, 40, 66, 0.35); }
   .boot-track { position: relative; height: 3px; border-radius: 3px; background: #e1e6ea; overflow: hidden; }
-  .boot-fill { position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(90deg, #6fa9cb, #0a6fa5); transform-origin: 0 50%; transform: scaleX(var(--p, 0.04)); transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+  .boot-fill { position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(90deg, #6fa9cb, #0a6fa5); transform-origin: 0 50%; transform: scaleX(max(0.04, var(--p)));
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+  .boot-fill::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent); transform: translateX(-100%); animation: bootShine 1.6s ease-in-out infinite; }
   .boot-row { display: flex; justify-content: space-between; gap: 12px; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #58626b; }
   .boot-row b { font-weight: 600; color: #0a6fa5; font-variant-numeric: tabular-nums; letter-spacing: 0; }
-  @keyframes bootPulse { to { stroke-dashoffset: 0; } }
-  @keyframes bootGlint { 0%, 100% { opacity: 0; transform: translateX(-30%); } 50% { opacity: 1; transform: translateX(30%); } }
+
+  @keyframes bootGrid { to { transform: translate3d(64px, 64px, 0); } }
+  @keyframes bootDrift { to { transform: translate3d(8vmax, 6vmax, 0) scale(1.08); } }
+  @keyframes bootFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  @keyframes bootDraw { 0% { stroke-dashoffset: 1; } 55% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -1; } }
   @keyframes bootBeat { 0%, 100% { opacity: 0.55; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1); } }
+  @keyframes bootSweep { 0% { opacity: 0; transform: translateX(-90px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateX(90px); } }
+  @keyframes bootShine { to { transform: translateX(100%); } }
   @keyframes bootIn { to { opacity: 1; transform: none; filter: none; } }
   @keyframes bootFade { to { opacity: 1; } }
   @media (prefers-reduced-motion: reduce) {
     #boot { transition: opacity 0.4s, visibility 0s linear 0.4s; clip-path: none; }
     #boot.is-out { clip-path: none; opacity: 0; }
-    #boot *, #boot *::before { animation: none !important; }
-    .boot-acr span, .boot-sub, .boot-meter { opacity: 1; transform: none; filter: none; }
-    .boot-chip .pulse { stroke-dasharray: none; stroke-dashoffset: 0; opacity: 0.5; }
-    .boot-chip .glint { opacity: 0; }
+    #boot *, #boot *::before, #boot *::after { animation: none !important; transition: none !important; }
+    .boot-acr span, .boot-sub, .boot-meta, .boot-meter { opacity: 1; transform: none; filter: none; }
+    .boot-chip .trace { stroke-dasharray: none; stroke-dashoffset: 0; }
   }
 </style>
 <div id="boot" role="status" aria-live="polite" aria-label="Loading ICCMM-26">
   <div class="boot-bg" aria-hidden="true"></div>
+  <div class="boot-orb boot-orb--a" aria-hidden="true"></div>
+  <div class="boot-orb boot-orb--b" aria-hidden="true"></div>
   <div class="boot-grid" aria-hidden="true"></div>
   <div class="boot-core">
-    <svg class="boot-chip" viewBox="0 0 240 240" aria-hidden="true">
+    <svg class="boot-chip" viewBox="0 20 300 275" aria-hidden="true">
       <defs>
-        <linearGradient id="bootDie" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b74ab" /><stop offset="0.55" stop-color="#085d8b" /><stop offset="1" stop-color="#064a70" /></linearGradient>
-        <linearGradient id="bootGlint" x1="0" y1="0" x2="1" y2="1"><stop offset="0.3" stop-color="#fff" stop-opacity="0" /><stop offset="0.5" stop-color="#fff" stop-opacity="0.45" /><stop offset="0.7" stop-color="#fff" stop-opacity="0" /></linearGradient>
+        <linearGradient id="bDie" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a86c0" /><stop offset="0.55" stop-color="#0a6fa5" /><stop offset="1" stop-color="#064a70" /></linearGradient>
+        <linearGradient id="bIhs" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f7f9" /><stop offset="0.5" stop-color="#d7dee3" /><stop offset="1" stop-color="#b9c3ca" /></linearGradient>
+        <linearGradient id="bSub" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#26313a" /><stop offset="1" stop-color="#151b20" /></linearGradient>
+        <linearGradient id="bSweep" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0" /><stop offset="0.5" stop-color="#fff" stop-opacity="0.85" /><stop offset="1" stop-color="#fff" stop-opacity="0" /></linearGradient>
+        <radialGradient id="bHalo"><stop offset="0" stop-color="#6fa9cb" stop-opacity="0.55" /><stop offset="1" stop-color="#6fa9cb" stop-opacity="0" /></radialGradient>
+        <clipPath id="bIhsTop"><polygon points="150,130 242,176 150,222 58,176" /></clipPath>
       </defs>
-      <!-- circuit traces leaving the package -->
-      <g>
-        <path class="trace" d="M120 64V18h-34" /><path class="trace" d="M98 64V34H40V8" /><path class="trace" d="M142 64V30h58" />
-        <path class="trace" d="M176 120h46v-40" /><path class="trace" d="M176 100h28V54" /><path class="trace" d="M176 142h50" />
-        <path class="trace" d="M120 176v48h40" /><path class="trace" d="M142 176v30h56v28" /><path class="trace" d="M98 176v40H44" />
-        <path class="trace" d="M64 120H16v46" /><path class="trace" d="M64 140H34v60" /><path class="trace" d="M64 98H12" />
+      <ellipse class="halo" cx="150" cy="190" rx="140" ry="80" fill="url(#bHalo)" />
+      <ellipse class="shadow" cx="150" cy="272" rx="112" ry="20" fill="rgba(10, 40, 66, 0.16)" />
+
+      <!-- Substrate with fan-out traces -->
+      <g class="L L-sub">
+        <polygon points="40,190 150,245 150,255 40,200" fill="#0f1418" />
+        <polygon points="150,245 260,190 260,200 150,255" fill="#1a2228" />
+        <polygon points="150,135 260,190 150,245 40,190" fill="url(#bSub)" />
+        <g transform="matrix(1.1 0.55 -1.1 0.55 150 135)" fill="none" stroke="#3f8fbf" stroke-width="0.9" stroke-linecap="round">
+          <path class="trace" pathLength="1" d="M50 30V8M42 30L30 8M58 30L70 8" />
+          <path class="trace" pathLength="1" d="M70 50H92M70 42L92 30M70 58L92 70" />
+          <path class="trace" pathLength="1" d="M50 70V92M42 70L30 92M58 70L70 92" />
+          <path class="trace" pathLength="1" d="M30 50H8M30 42L8 30M30 58L8 70" />
+        </g>
+        <g transform="matrix(1.1 0.55 -1.1 0.55 150 135)" fill="#c9a24a" opacity="0.85">
+          <rect x="4" y="4" width="3" height="3" /><rect x="93" y="4" width="3" height="3" /><rect x="4" y="93" width="3" height="3" /><rect x="93" y="93" width="3" height="3" />
+        </g>
       </g>
-      <g>
-        <path class="pulse" pathLength="1" d="M120 64V18h-34" /><path class="pulse" pathLength="1" d="M176 120h46v-40" /><path class="pulse" pathLength="1" d="M120 176v48h40" />
-        <path class="pulse" pathLength="1" d="M64 120H16v46" /><path class="pulse" pathLength="1" d="M142 64V30h58" /><path class="pulse" pathLength="1" d="M98 176v40H44" />
+
+      <!-- Interconnect (metal routing layer) -->
+      <g class="L L-rdl">
+        <polygon points="76,188 150,225 150,227 76,190" fill="rgba(160, 190, 210, 0.5)" />
+        <polygon points="150,225 224,188 224,190 150,227" fill="rgba(180, 205, 222, 0.5)" />
+        <polygon points="150,151 224,188 150,225 76,188" fill="rgba(214, 232, 243, 0.42)" stroke="rgba(10, 111, 165, 0.35)" stroke-width="0.6" />
+        <g transform="matrix(0.74 0.37 -0.74 0.37 150 151)" stroke="#e8f3fa" stroke-width="1.1" opacity="0.9">
+          <path d="M10 14H62M18 26H90M8 38H54M30 50H92M10 62H70M22 74H88M8 86H48" />
+          <path d="M20 8V40M44 30V92M74 10V58M86 60V94" stroke="#bcd9ea" />
+        </g>
       </g>
-      <circle class="node" cx="86" cy="18" r="3" /><circle class="node" cx="222" cy="80" r="3" /><circle class="node" cx="160" cy="224" r="3" /><circle class="node" cx="16" cy="166" r="3" />
-      <circle class="node" cx="200" cy="30" r="3" /><circle class="node" cx="44" cy="216" r="3" />
-      <!-- pins -->
-      <g class="pin">
-        <path d="M84 58v6M98 58v6M112 58v6M128 58v6M142 58v6M156 58v6" /><path d="M84 176v6M98 176v6M112 176v6M128 176v6M142 176v6M156 176v6" />
-        <path d="M58 84h6M58 98h6M58 112h6M58 128h6M58 142h6M58 156h6" /><path d="M176 84h6M176 98h6M176 112h6M176 128h6M176 142h6M176 156h6" />
+
+      <!-- Silicon die -->
+      <g class="L L-die">
+        <polygon points="94,182 150,210 150,216 94,188" fill="#053d5d" />
+        <polygon points="150,210 206,182 206,188 150,216" fill="#064a70" />
+        <polygon points="150,154 206,182 150,210 94,182" fill="url(#bDie)" />
+        <g transform="matrix(0.56 0.28 -0.56 0.28 150 154)">
+          <g fill="rgba(255, 255, 255, 0.16)"><rect x="10" y="10" width="36" height="36" rx="2" /><rect x="54" y="10" width="36" height="36" rx="2" /><rect x="10" y="54" width="36" height="36" rx="2" /><rect x="54" y="54" width="36" height="36" rx="2" /></g>
+          <path d="M28 10V46M10 28H46M72 10V46M54 28H90M28 54V90M10 72H46M72 54V90M54 72H90" stroke="rgba(255, 255, 255, 0.22)" stroke-width="0.8" />
+          <rect class="core" x="44" y="44" width="12" height="12" rx="2" fill="#fff" />
+        </g>
       </g>
-      <rect class="pkg" x="64" y="64" width="112" height="112" rx="14" />
-      <rect class="die" x="86" y="86" width="68" height="68" rx="6" />
-      <path class="die-line" d="M97 86v68M109 86v68M120 86v68M131 86v68M143 86v68M86 97h68M86 109h68M86 131h68M86 143h68" />
-      <rect class="glint" x="86" y="86" width="68" height="68" rx="6" />
-      <rect class="core-dot" x="113" y="113" width="14" height="14" rx="3" />
+
+      <!-- Integrated heat spreader -->
+      <g class="L L-ihs">
+        <polygon points="58,176 150,222 150,236 58,190" fill="#a7b1b8" />
+        <polygon points="150,222 242,176 242,190 150,236" fill="#c3cbd1" />
+        <polygon points="150,130 242,176 150,222 58,176" fill="url(#bIhs)" />
+        <g transform="matrix(0.92 0.46 -0.92 0.46 150 130)">
+          <rect x="12" y="12" width="76" height="76" rx="6" fill="none" stroke="rgba(20, 24, 28, 0.12)" stroke-width="0.8" />
+          <text x="20" y="46" font-size="13" font-weight="800" letter-spacing="-0.6" fill="rgba(20, 24, 28, 0.62)">ICCMM-26</text>
+          <text x="20" y="58" font-size="5.2" font-weight="600" letter-spacing="0.4" fill="rgba(10, 111, 165, 0.8)">IEEE CONFERENCE ID 66375</text>
+        </g>
+        <g clip-path="url(#bIhsTop)"><rect class="sweep" x="110" y="120" width="80" height="120" fill="url(#bSweep)" transform="skewX(-20)" /></g>
+      </g>
     </svg>
     <p class="boot-acr" aria-label="ICCMM-26"><span style="--i:0">I</span><span style="--i:1">C</span><span style="--i:2">C</span><span style="--i:3">M</span><span style="--i:4">M</span><span class="dash" style="--i:5">-</span><span style="--i:6">2</span><span style="--i:7">6</span></p>
-    <p class="boot-sub"><em>Next-Gen Computing</em> · 20–21 November 2026 · MJCET, Hyderabad</p>
+    <p class="boot-sub">1st International Conference on <em>Next-Gen Computing</em></p>
+    <p class="boot-meta">20–21 November 2026 · MJCET, Hyderabad</p>
     <div class="boot-meter">
       <div class="boot-track"><span class="boot-fill"></span></div>
-      <div class="boot-row"><span class="boot-step">Loading typography</span><b class="boot-count">0 / 0</b></div>
+      <div class="boot-row"><span class="boot-step">Loading typography</span><b class="boot-count">0%</b></div>
     </div>
   </div>
 </div>
@@ -97,9 +160,8 @@
     var boot = document.getElementById('boot');
     var html = document.documentElement;
     if (!boot) return;
-    if (html.classList.contains('boot-skip')) { boot.remove(); window.__bootDone = true; return; }
     html.classList.add('is-booting');
-    // Real milestones only. The bar moves when one finishes; nothing is simulated.
+    // Real milestones only: the bar and the processor assembly move when one finishes; nothing is simulated.
     var home = document.body.getAttribute('data-page') === 'home';
     var tasks = [
       { id: 'fonts', label: 'Loading typography' },
@@ -107,31 +169,44 @@
     ];
     if (home) tasks.push({ id: 'scene', label: 'Rendering processor' });
     tasks.push({ id: 'media', label: 'Loading images' });
-    var done = {}, finished = false, t0 = performance.now(), appAt = 0;
-    var fill = boot.querySelector('.boot-fill'), step = boot.querySelector('.boot-step'), count = boot.querySelector('.boot-count');
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Long enough to read as an entrance, short enough not to get in the way
+    var minShow = reduced ? 0 : home ? 1700 : 900;
+    var done = {}, finishing = false, t0 = performance.now();
+    var step = boot.querySelector('.boot-step'), count = boot.querySelector('.boot-count');
     function render() {
       var n = 0, next = null;
       for (var i = 0; i < tasks.length; i++) { if (done[tasks[i].id]) n++; else if (!next) next = tasks[i]; }
-      fill.style.setProperty('--p', Math.max(0.04, n / tasks.length));
-      count.textContent = n + ' / ' + tasks.length;
+      var p = n / tasks.length;
+      boot.style.setProperty('--p', p.toFixed(3));
+      count.textContent = Math.round(p * 100) + '%';
       step.textContent = next ? next.label : 'Ready';
       return n === tasks.length;
     }
     function finish() {
-      if (finished) return;
-      finished = true;
-      try { sessionStorage.setItem('iccmm-boot', '1'); } catch (e) {}
-      boot.classList.add('is-out');
-      html.classList.remove('is-booting');
-      window.__bootDone = true;
-      window.dispatchEvent(new Event('iccmm:boot-done'));
-      setTimeout(function () { boot.remove(); }, 1000);
+      if (finishing) return;
+      finishing = true;
+      for (var i = 0; i < tasks.length; i++) done[tasks[i].id] = true;
+      render();
+      // Let the processor settle into place and catch the light, then lift the screen
+      var settle = reduced ? 0 : 750;
+      setTimeout(function () {
+        boot.classList.add('is-ready');
+        setTimeout(function () {
+          boot.classList.add('is-out');
+          html.classList.remove('is-booting');
+          window.__bootDone = true;
+          window.dispatchEvent(new Event('iccmm:boot-done'));
+          setTimeout(function () { boot.remove(); }, 1100);
+        }, reduced ? 0 : 520);
+      }, Math.max(settle, minShow - (performance.now() - t0)));
     }
     function mark(id) {
-      if (done[id] || finished) return;
+      if (done[id] || finishing) return;
       done[id] = true;
-      if (id === 'app') { appAt = performance.now(); setTimeout(finish, 1600); } // the 3D scene builds progressively behind the page, so don't hold it for long
-      if (render()) setTimeout(finish, Math.max(0, 1100 - (performance.now() - t0)) + 250);
+      // Once the app runs, wait a bounded time for the rest (the 3D scene builds progressively)
+      if (id === 'app') setTimeout(finish, home ? 4500 : 1200);
+      if (render()) finish();
     }
     render();
     (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(function () { mark('fonts'); });
@@ -139,6 +214,6 @@
     window.addEventListener('iccmm:scene', function () { mark('scene'); });
     if (document.readyState === 'complete') mark('media'); else window.addEventListener('load', function () { mark('media'); });
     if (window.__iccmmReady) mark('app');
-    setTimeout(finish, 7000); // failsafe: never hold the page
+    setTimeout(finish, 10000); // failsafe: never hold the page
   })();
 </script>
