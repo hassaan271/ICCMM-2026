@@ -90,10 +90,17 @@ export function ArchitectureStory() {
   // Release the loading screen straight away rather than waiting for a scene that won't arrive
   const onSceneFail = useCallback(() => { setSceneFailed(true); signalBoot('scene'); }, []);
 
+  // Starting the 3D scene (evaluating its chunk, creating the WebGL context) is heavy main-thread work.
+  // Behind the loading screen it starts at once; on a repeat visit or refresh (no loading screen) it
+  // waits until the title has animated in, then fades in, so the opening never stutters.
+  const [sceneGo, setSceneGo] = useState(false);
+
   useLayoutEffect(() => {
     story.mobile = isMobile();
     story.reduced = prefersReduced();
     setReady(true);
+    const covered = !!document.getElementById('boot') && !(window as unknown as { __bootDone?: boolean }).__bootDone;
+    if (covered || story.reduced) setSceneGo(true);
   }, []);
 
   useEffect(() => {
@@ -135,6 +142,7 @@ export function ArchitectureStory() {
       // Opening sequence: lights up, camera settles, title resolves, details follow
       const tl = gsap.timeline({ delay: 0.15, paused: true });
       stopBoot = onBootDone(() => tl.play());
+      tl.call(() => setSceneGo(true), undefined, 1.5);
       if (story.reduced) {
         story.intro = 1;
         gsap.set('.hero-char-i', { y: 0, yPercent: 0 });
@@ -173,7 +181,7 @@ export function ArchitectureStory() {
         <div className="stage-bg" />
         <div className="stage-grid" data-depth="0.12" />
         <div className="stage-glow" data-depth="0.6" />
-        {ready && !sceneFailed && (
+        {ready && sceneGo && !sceneFailed && (
           <SceneBoundary onFail={onSceneFail}>
             <Suspense fallback={null}>
               <ProcessorScene active={active} onFail={onSceneFail} />

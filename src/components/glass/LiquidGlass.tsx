@@ -49,8 +49,13 @@ function displacementMap(w: number, h: number, r: number, bezel: number, maxPx: 
   const ctx = c.getContext('2d')!;
   const img = ctx.createImageData(W, H);
   const hx = w / 2, hy = h / 2, rr = Math.min(r, hx, hy);
+  // The flat centre has no displacement, so only the rim band (plus the rounded corners) is computed
+  new Uint32Array(img.data.buffer).fill(0xff808080); // RGBA 128,128,128,255 (little-endian)
+  const band = Math.ceil((bezel + 2) * s), corner = Math.ceil((rr + 2) * s);
   for (let j = 0; j < H; j++) {
+    const edgeRow = j < Math.max(band, corner) || j >= H - Math.max(band, corner);
     for (let i = 0; i < W; i++) {
+      if (!edgeRow && i >= band && i < W - band) { i = W - band - 1; continue; }
       const px = (i + 0.5) / s - hx, py = (j + 0.5) / s - hy;
       const qx = Math.abs(px) - (hx - rr), qy = Math.abs(py) - (hy - rr);
       // signed distance (negative inside) and outward normal of the rounded rect
@@ -70,7 +75,27 @@ function displacementMap(w: number, h: number, r: number, bezel: number, maxPx: 
     }
   }
   ctx.putImageData(img, 0, 0);
-  return c.toDataURL();
+  // Encoded off the main thread (toBlob is async; toDataURL would block while it compresses)
+  return new Promise<string | null>((res) => c.toBlob((b) => res(b ? URL.createObjectURL(b) : null)));
+}
+
+/* Map builds are queued and run one at a time in idle periods, so mounting a page full of glass never
+   blocks the first paint or the intro animation. Until its map is ready a panel renders without the lens. */
+const queue: (() => void)[] = [];
+let pumping = false;
+const idle = (cb: (d?: IdleDeadline) => void) =>
+  typeof requestIdleCallback === 'function' ? requestIdleCallback(cb, { timeout: 600 }) : setTimeout(() => cb(), 32);
+function pump(deadline?: IdleDeadline) {
+  pumping = true;
+  const t0 = performance.now();
+  // One map at minimum per slice, more while the idle period lasts
+  do { queue.shift()?.(); } while (queue.length && (deadline ? deadline.timeRemaining() > 8 : performance.now() - t0 < 8));
+  if (queue.length) idle(pump); else pumping = false;
+}
+function schedule(task: () => void) {
+  queue.push(task);
+  if (!pumping) { pumping = true; idle(pump); }
+  return () => { const i = queue.indexOf(task); if (i >= 0) queue.splice(i, 1); };
 }
 
 type Props = {
@@ -98,19 +123,29 @@ export function LiquidGlass({ as: Tag = 'div', tint = 'frost', className = '', s
   useEffect(() => {
     if (!on || !ref.current) return;
     const el = ref.current;
-    let raf = 0;
+    let cancel = () => {};
+    let near = false, live = true;
+    let last = { w: 0, h: 0, r: -1 };
     const build = () => {
-      raf = 0;
       const w = Math.round(el.offsetWidth), h = Math.round(el.offsetHeight);
       if (w < 4 || h < 4) return;
       const r = Math.min(parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0, w / 2, h / 2);
       const bz = bezel ?? Math.max(14, Math.min(40, Math.min(w, h) * 0.28));
-      setGeo((g) => (g && g.w === w && g.h === h && g.r === r ? g : { w, h, r, map: displacementMap(w, h, r, bz, refraction) }));
+      if (last.w === w && last.h === h && last.r === r) return;
+      last = { w, h, r };
+      displacementMap(w, h, r, bz, refraction).then((map) => {
+        if (!live || !map) { if (map) URL.revokeObjectURL(map); return; }
+        if (last.w !== w || last.h !== h || last.r !== r) { URL.revokeObjectURL(map); return; } // superseded by a resize
+        setGeo((g) => { if (g) setTimeout(() => URL.revokeObjectURL(g.map), 1000); return { w, h, r, map }; });
+      });
     };
-    const ro = new ResizeObserver(() => { if (!raf) raf = requestAnimationFrame(build); });
+    const request = () => { if (!near) return; cancel(); cancel = schedule(build); };
+    // Only panels on or near the screen get a map; the rest are built as they scroll into range
+    const io = new IntersectionObserver(([e]) => { near = e.isIntersecting; if (near) request(); }, { rootMargin: '50% 0px' });
+    const ro = new ResizeObserver(request);
+    io.observe(el);
     ro.observe(el);
-    build();
-    return () => { ro.disconnect(); cancelAnimationFrame(raf); };
+    return () => { live = false; io.disconnect(); ro.disconnect(); cancel(); };
   }, [on, bezel, refraction]);
 
   const lens = on && geo;

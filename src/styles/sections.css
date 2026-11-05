@@ -99,12 +99,12 @@
 @media (max-width: 1000px) {
   .hero-inner { grid-template-columns: 1fr; padding-top: 104px; align-content: end; }
   
-  /* room for the processor above the title (the acronym now leads the block) */
-  .hero-copy { padding-top: calc(34vh + 72px); }
+
+  .hero-copy { padding-top: 34vh; }
   .hero-count { min-width: 0; }
 }
 @media (max-width: 600px) {
-  .hero-copy { padding-top: calc(26vh + 72px); }
+  .hero-copy { padding-top: 26vh; }
   .hero-supporters-inner { justify-content: flex-start; }
   .hs-item { width: 100%; justify-content: space-between; }
   .count-cell { padding: 0 4px; }
@@ -486,3 +486,7 @@
 }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 @keyframes ping { 0% { transform: scale(0.4); opacity: 0.9; } 100% { transform: scale(2.4); opacity: 0; } }
+/* Portrait screens: the processor sits above the title (see CameraRig "narrow"), so leave room for it
+   now that the acronym leads the hero block */
+@media (max-width: 1000px) and (max-aspect-ratio: 21/20) { .hero-copy { padding-top: calc(34vh + 72px); } }
+@media (max-width: 600px) and (max-aspect-ratio: 21/20) { .hero-copy { padding-top: calc(26vh + 72px); } }
