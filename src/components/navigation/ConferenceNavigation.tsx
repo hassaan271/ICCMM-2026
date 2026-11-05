@@ -19,7 +19,8 @@ export const navTree: Item[] = [
     ],
   },
   { text: 'Tracks', url: href('tracks'), key: 'tracks' },
-  { text: 'Speakers', url: href('guests'), key: 'speakers' },
+  { text: 'Speakers', url: href('speakers'), key: 'speakers' },
+  { text: 'Guests', url: href('guests'), key: 'guests' },
   { text: 'Programme', url: href('programme'), key: 'programme' },
   {
     text: 'Registration', url: href('registration'), key: 'registration', children: [
@@ -36,7 +37,7 @@ export const navTree: Item[] = [
   { text: 'Venue', url: href('venue'), key: 'venue' },
 ];
 
-const currentKey: Partial<Record<PageKey, string>> = { home: 'home', about: 'about', tracks: 'tracks', guests: 'speakers', programme: 'programme', cfp: 'cfp', events: 'cfp', registration: 'registration', sponsors: 'registration', committee: 'committee', venue: 'venue' };
+const currentKey: Partial<Record<PageKey, string>> = { home: 'home', about: 'about', tracks: 'tracks', speakers: 'speakers', guests: 'guests', programme: 'programme', cfp: 'cfp', events: 'cfp', registration: 'registration', sponsors: 'registration', committee: 'committee', venue: 'venue' };
 
 export function ConferenceNavigation({ page }: { page: PageKey }) {
   const [menuOpen, setMenuOpen] = useState(false);

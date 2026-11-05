@@ -1,6 +1,6 @@
 import { about, meta, organizers, sponsorsLine, importantDates } from '../data/conference';
 import { schedule } from '../data/schedule';
-import { guests } from '../data/guests';
+import { guests, keynoteIds } from '../data/guests';
 import { href } from '../utils/routes';
 import { Eyebrow, Heading, pad } from '../components/shared/Typography';
 import { PageHeader } from '../components/shared/PageHeader';
@@ -11,7 +11,7 @@ import { ArrowIcon } from '../components/shared/Icons';
 
 const explore = [
   { url: href('programme'), label: 'Programme', t: 'Event flow', d: `Two days, ${schedule.reduce((n, d) => n + d.items.length, 0)} programme items, as issued by the organisers.` },
-  { url: href('guests'), label: 'People', t: 'Speakers & guests', d: `${guests.length} confirmed guests, keynote speakers and session chairs.` },
+  { url: href('speakers'), label: 'People', t: 'Speakers & guests', d: `${keynoteIds.length} keynote speakers, plus ${guests.length - keynoteIds.length} confirmed guests and session chairs on the Guests page.` },
   { url: href('tracks'), label: 'Research', t: 'Technical tracks', d: 'Four tracks across computing, microelectronics and mechatronics.' },
 ];
 

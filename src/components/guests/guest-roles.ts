@@ -1,5 +1,9 @@
 import { schedule, fmtTime, weekday } from '../../data/schedule';
-import type { Guest } from '../../data/guests';
+import { keynoteIds, type Guest } from '../../data/guests';
+import { href } from '../../utils/routes';
+
+/** Profile link: keynote speakers live on the Speakers page, everyone else on the Guests page */
+export const profileHref = (id: string) => href(keynoteIds.includes(id) ? 'speakers' : 'guests', `guest-${id}`);
 
 /** A guest's programme roles, resolved to day, time and session title */
 export const rolesOf = (g: Guest) => g.roles.flatMap((r) => {

@@ -14,11 +14,12 @@ import { Sponsors } from './pages/Sponsors';
 import { Venue } from './pages/Venue';
 import { About } from './pages/About';
 import { Tracks } from './pages/Tracks';
+import { Speakers } from './pages/Speakers';
 import { Guests } from './pages/Guests';
 import { EventFlow } from './pages/EventFlow';
 
 const PAGES: Record<PageKey, () => ReactElement> = {
-  home: Home, about: About, tracks: Tracks, guests: Guests, programme: EventFlow, cfp: CallForPapers, registration: Registration, committee: Committee, events: Events, sponsors: Sponsors, venue: Venue,
+  home: Home, about: About, tracks: Tracks, speakers: Speakers, guests: Guests, programme: EventFlow, cfp: CallForPapers, registration: Registration, committee: Committee, events: Events, sponsors: Sponsors, venue: Venue,
 };
 
 // Hash links pointing at the current page scroll smoothly instead of jumping

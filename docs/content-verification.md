@@ -37,4 +37,4 @@ The schedule lists these three, but Guest Info marks them **NO**. They're left o
 
 ## Schedule details not yet issued
 
-Halls and rooms, paper lists for each session, keynote and panel titles, tracks for the online Sessions 6 and 9, and the valedictory chief guest. Day 1 also has no entry between 5:30 PM and 6:00 PM. These gaps are listed at the bottom of the Event Flow page.
+Halls and rooms, paper lists for each session, keynote and panel titles, tracks for the online Sessions 6 and 9, and the valedictory chief guest. Day 1 also has no entry between 5:30 PM and 6:00 PM. These gaps were listed at the bottom of the Event Flow page; that section has been removed at the organisers' request, so they are tracked here only.

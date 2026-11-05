@@ -1,14 +1,24 @@
 // Procedural surface maps for the processor. Everything is generated at runtime on <canvas>,
 // so the model ships without downloading texture files.
+// Generation is cooperative: the work is split into short slices that yield to the browser,
+// so building the maps never freezes scrolling, input or the intro animation.
 import { CanvasTexture, RepeatWrapping, SRGBColorSpace, type Texture } from 'three';
 
 type Ctx = CanvasRenderingContext2D;
-const canvas = (w: number, h = w) => {
+// Only height maps are read back (getImageData); the rest stay GPU-accelerated
+const canvas = (w: number, h = w, read = false) => {
   const c = document.createElement('canvas');
   c.width = w; c.height = h;
-  return [c, c.getContext('2d', { willReadFrequently: true })!] as const;
+  return [c, c.getContext('2d', { willReadFrequently: read })!] as const;
 };
 const rng = (seed: number) => () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+
+// Hand control back to the browser between slices of work
+export const yieldToMain = () => new Promise<void>((r) => {
+  const s = (globalThis as { scheduler?: { yield?: () => Promise<void> } }).scheduler;
+  if (s?.yield) s.yield().then(r); else setTimeout(r, 0);
+});
+const SLICE_MS = 8;
 
 const tex = (c: HTMLCanvasElement, srgb = false, aniso = 8): Texture => {
   const t = new CanvasTexture(c);
@@ -18,13 +28,15 @@ const tex = (c: HTMLCanvasElement, srgb = false, aniso = 8): Texture => {
 };
 
 // Height map (grayscale canvas) → tangent-space normal map (Sobel)
-function normalFromHeight(src: HTMLCanvasElement, strength = 2) {
+async function normalFromHeight(src: HTMLCanvasElement, strength = 2) {
   const w = src.width, h = src.height;
   const s = src.getContext('2d')!.getImageData(0, 0, w, h).data;
   const [c, ctx] = canvas(w, h);
   const out = ctx.createImageData(w, h);
   const H = (x: number, y: number) => s[(((y + h) % h) * w + ((x + w) % w)) * 4] / 255;
+  let t0 = performance.now();
   for (let y = 0; y < h; y++) {
+    if (performance.now() - t0 > SLICE_MS) { await yieldToMain(); t0 = performance.now(); }
     for (let x = 0; x < w; x++) {
       const dx = (H(x + 1, y) - H(x - 1, y)) * strength;
       const dy = (H(x, y + 1) - H(x, y - 1)) * strength;
@@ -41,10 +53,10 @@ function normalFromHeight(src: HTMLCanvasElement, strength = 2) {
 }
 
 /* ───────── Silicon die: a plausible multi-core floorplan ───────── */
-export function dieMaps(size: number) {
+export async function dieMaps(size: number) {
   const W = size, H = Math.round(size * (1.5 / 2.2));
   const [cc, c] = canvas(W, H); // colour
-  const [hc, h] = canvas(W, H); // height
+  const [hc, h] = canvas(W, H, true); // height
   const [rc, r] = canvas(W, H); // roughness (g channel)
   const rand = rng(7);
   const k = W / 1000;
@@ -130,13 +142,13 @@ export function dieMaps(size: number) {
   c.fillStyle = 'rgba(214,226,235,0.7)';
   [[22, 22], [978, 22], [22, H / k - 22], [978, H / k - 22]].forEach(([x, y]) => { c.fillRect((x - 6) * k, (y - 1) * k, 12 * k, 2 * k); c.fillRect((x - 1) * k, (y - 6) * k, 2 * k, 12 * k); });
 
-  return { map: tex(cc, true), normalMap: tex(normalFromHeight(hc, 3)), roughnessMap: tex(rc) };
+  return { map: tex(cc, true), normalMap: tex(await normalFromHeight(hc, 3)), roughnessMap: tex(rc) };
 }
 
 /* ───────── Package substrate (top face): dark laminate, fan-out routing, capacitor land ───────── */
-export function substrateMaps(size: number, label: string) {
+export async function substrateMaps(size: number, label: string) {
   const [cc, c] = canvas(size);
-  const [hc, h] = canvas(size);
+  const [hc, h] = canvas(size, size, true);
   const k = size / 4; // world units → px (substrate is 4 × 4)
   const P = (u: number) => (u + 2) * k;
   const rand = rng(23);
@@ -175,14 +187,14 @@ export function substrateMaps(size: number, label: string) {
   c.fillStyle = 'rgba(214,224,232,0.6)';
   c.font = `600 ${0.075 * k}px Inter, Arial, sans-serif`;
   c.fillText(label, P(-1.84), P(1.86));
-  return { map: tex(cc, true), normalMap: tex(normalFromHeight(hc, 1.5)) };
+  return { map: tex(cc, true), normalMap: tex(await normalFromHeight(hc, 1.5)) };
 }
 
 /* ───────── Nickel-plated heat spreader: brushed finish + laser marking ───────── */
-export function ihsMaps(size: number) {
+export async function ihsMaps(size: number) {
   const [rc, r] = canvas(size); // roughness
   const [mc, m] = canvas(size); // albedo (etched marking darker)
-  const [hc, h] = canvas(size); // micro-scratch height
+  const [hc, h] = canvas(size, size, true); // micro-scratch height
   const rand = rng(91);
   r.fillStyle = 'rgb(0,80,0)'; r.fillRect(0, 0, size, size);
   h.fillStyle = '#808080'; h.fillRect(0, 0, size, size);
@@ -207,7 +219,7 @@ export function ihsMaps(size: number) {
   };
   text('ICCMM-26', 190, 400, 66, 700);
   text('IEEE Conference ID 66375', 190, 460, 30, 500);
-  const map = tex(mc, true), roughnessMap = tex(rc), normalMap = tex(normalFromHeight(hc, 1));
+  const map = tex(mc, true), roughnessMap = tex(rc), normalMap = tex(await normalFromHeight(hc, 1));
   return { map, roughnessMap, normalMap };
 }
 
@@ -240,8 +252,8 @@ export function interconnectMap(size: number, seed: number, horizontal: boolean)
 }
 
 /* ───────── Solder TIM: soft mottled metal ───────── */
-export function timMaps(size: number) {
-  const [hc, h] = canvas(size);
+export async function timMaps(size: number) {
+  const [hc, h] = canvas(size, size, true);
   const rand = rng(5);
   h.fillStyle = '#808080'; h.fillRect(0, 0, size, size);
   for (let i = 0; i < 2600; i++) {
@@ -249,9 +261,39 @@ export function timMaps(size: number) {
     h.fillStyle = `rgba(${v},${v},${v},0.06)`;
     h.beginPath(); h.arc(rand() * size, rand() * size, 2 + rand() * 14, 0, Math.PI * 2); h.fill();
   }
-  const n = tex(normalFromHeight(hc, 2.5));
+  const n = tex(await normalFromHeight(hc, 2.5));
   n.wrapS = n.wrapT = RepeatWrapping;
   return { normalMap: n };
 }
 
 export type { Ctx };
+
+export type ProcessorMaps = {
+  die: Awaited<ReturnType<typeof dieMaps>>;
+  sub: Awaited<ReturnType<typeof substrateMaps>>;
+  ihs: Awaited<ReturnType<typeof ihsMaps>>;
+  rdl1: Texture;
+  rdl2: Texture;
+  tim: Awaited<ReturnType<typeof timMaps>>;
+};
+
+// Built once per page and shared, so a remount (or React StrictMode) never generates the maps twice
+let cache: Promise<ProcessorMaps> | null = null;
+export function loadProcessorMaps(mobile: boolean) {
+  if (cache) return cache;
+  const S = mobile ? 1024 : 2048;
+  cache = (async () => {
+    // Make sure the marking font is ready, then build one map set per slice
+    await (document.fonts?.ready ?? Promise.resolve());
+    await yieldToMain();
+    const die = await dieMaps(S); await yieldToMain();
+    const sub = await substrateMaps(S, 'ICCMM-26'); await yieldToMain();
+    const ihs = await ihsMaps(S); await yieldToMain();
+    const rdl1 = interconnectMap(S, 3, true); await yieldToMain();
+    const rdl2 = interconnectMap(S, 9, false); await yieldToMain();
+    const tim = await timMaps(512);
+    return { die, sub, ihs, rdl1, rdl2, tim };
+  })();
+  cache.catch(() => { cache = null; });
+  return cache;
+}

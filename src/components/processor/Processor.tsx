@@ -1,10 +1,10 @@
-import { memo, useLayoutEffect, useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
 import {
   BoxGeometry, CylinderGeometry, ExtrudeGeometry, Group, InstancedMesh, Object3D, Shape, Path, SphereGeometry, Vector3,
   type Mesh, type MeshPhysicalMaterial,
 } from 'three';
-import { dieMaps, substrateMaps, ihsMaps, interconnectMap, timMaps } from './textures';
+import { loadProcessorMaps, yieldToMain, type ProcessorMaps } from './textures';
 import { story, poseAt } from '../../animations/story';
 import { pointer } from '../../animations/motion';
 
@@ -83,17 +83,44 @@ const LABEL_FOCUS: Record<string, string[]> = {
   substrate: ['substrate', 'pads'],
 };
 
-export const Processor = memo(function Processor() {
+/* Progressive start-up: build the surface maps in slices, upload them to the GPU one per frame,
+   compile the shaders asynchronously, and only then show the model. Nothing here blocks the page. */
+export const Processor = memo(function Processor({ onReady, onFail }: { onReady: () => void; onFail: () => void }) {
+  const [maps, setMaps] = useState<ProcessorMaps | null>(null);
+  useEffect(() => {
+    let live = true;
+    loadProcessorMaps(story.mobile).then((m) => { if (live) setMaps(m); }).catch(() => { if (live) onFail(); });
+    return () => { live = false; };
+  }, [onFail]);
+  return maps ? <Warmup maps={maps} onReady={onReady} onFail={onFail} /> : null;
+});
+
+function Warmup({ maps, onReady, onFail }: { maps: ProcessorMaps; onReady: () => void; onFail: () => void }) {
+  const { gl, camera, scene } = useThree();
+  const model = useRef<Group>(null);
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    let live = true;
+    (async () => {
+      const textures = [maps.die.map, maps.die.normalMap, maps.die.roughnessMap, maps.sub.map, maps.sub.normalMap,
+        maps.ihs.map, maps.ihs.roughnessMap, maps.ihs.normalMap, maps.rdl1, maps.rdl2, maps.tim.normalMap];
+      for (const t of textures) { if (!live) return; gl.initTexture(t); await yieldToMain(); }
+      // The wrapper stays hidden while the inner model compiles (compileAsync only walks visible objects)
+      if (model.current) await gl.compileAsync(model.current, camera, scene);
+      if (live) setShown(true);
+    })().catch(() => { if (live) onFail(); });
+    return () => { live = false; };
+  }, [maps, gl, camera, scene, onFail]);
+  useEffect(() => { if (shown) requestAnimationFrame(onReady); }, [shown, onReady]);
+  return (
+    <group visible={shown}>
+      <group ref={model}><ProcessorModel maps={maps} /></group>
+    </group>
+  );
+}
+
+function ProcessorModel({ maps }: { maps: ProcessorMaps }) {
   const mobile = story.mobile;
-  const T = mobile ? 1024 : 2048;
-  const maps = useMemo(() => ({
-    die: dieMaps(T),
-    sub: substrateMaps(mobile ? 1024 : 2048, 'ICCMM-26'),
-    ihs: ihsMaps(mobile ? 1024 : 2048),
-    rdl1: interconnectMap(mobile ? 1024 : 2048, 3, true),
-    rdl2: interconnectMap(mobile ? 1024 : 2048, 9, false),
-    tim: timMaps(512),
-  }), [T, mobile]);
 
   const geo = useMemo(() => {
     const substrate = extrudeUp(roundedRect(SUB, SUB, 0.06), SUB_T - 0.02, 0.008);
@@ -311,6 +338,6 @@ export const Processor = memo(function Processor() {
       </group>
     </group>
   );
-});
+}
 
 export type { Mesh };

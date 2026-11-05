@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { posterSession, posterDates, meta, fees } from '../data/conference';
+import { posterSession, posterDates, meta, fees, eventFee } from '../data/conference';
 import { href } from '../utils/routes';
 import { lockScroll } from '../animations/motion';
 import { Accordion } from '../components/shared/Controls';
@@ -59,8 +59,8 @@ export function Events() {
               <ul className="plain-list">{posterSession.presentation.map((p) => <li key={p}>{p}</li>)}</ul>
               <GlassPanel kind="light" className="fee-mini">
                 <p className="label">Registration fee (INR)</p>
-                <p><strong>Poster Presentation:</strong> {posterFee.fee}</p>
-                <p><strong>Best PhD / M.Tech Thesis Presentation:</strong> {thesisFee.fee}</p>
+                <p><strong>Poster Presentation:</strong> {eventFee(posterFee).price} {eventFee(posterFee).unit} · {posterFee.note}</p>
+                <p><strong>Best PhD / M.Tech Thesis Presentation:</strong> {eventFee(thesisFee).price} {eventFee(thesisFee).unit}</p>
               </GlassPanel>
             </div>
           </div>

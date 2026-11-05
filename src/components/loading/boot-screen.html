@@ -130,7 +130,7 @@
     function mark(id) {
       if (done[id] || finished) return;
       done[id] = true;
-      if (id === 'app') { appAt = performance.now(); setTimeout(finish, 2200); } // don't wait long on non-essentials
+      if (id === 'app') { appAt = performance.now(); setTimeout(finish, 1600); } // the 3D scene builds progressively behind the page, so don't hold it for long
       if (render()) setTimeout(finish, Math.max(0, 1100 - (performance.now() - t0)) + 250);
     }
     render();

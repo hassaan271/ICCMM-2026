@@ -104,8 +104,8 @@ html:not(.lg-refract).nav-on-dark .nav-bar.lg { --lg-body: rgba(24, 28, 32, 0.82
 .float-cta-inner.lg { display: flex; align-items: center; gap: 16px; padding: 6px 6px 6px 22px; border-radius: 999px; }
 .float-cta-meta { color: var(--graphite); font-weight: 500; }
 .float-cta-meta strong { color: var(--ink); }
-/* Hero badge, countdown, scroll cue */
-.hero-badge.lg { border-radius: 999px; }
+/* Hero conference ID, countdown, scroll cue */
+.hero-id.lg { border-radius: 18px; }
 .hero-count.lg { border-radius: 30px; }
 
 /* Chapter panels and the venue card */

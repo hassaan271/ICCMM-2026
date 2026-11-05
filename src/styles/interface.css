@@ -89,14 +89,13 @@
 }
 .stage-grid { position: absolute; inset: -80px; background-image: linear-gradient(rgba(10,111,165,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(10,111,165,0.07) 1px, transparent 1px); background-size: 64px 64px; -webkit-mask-image: radial-gradient(60% 60% at 60% 45%, #000, transparent 75%); mask-image: radial-gradient(60% 60% at 60% 45%, #000, transparent 75%); }
 .stage-glow { position: absolute; width: 60vw; height: 60vw; right: -10vw; top: -10vw; border-radius: 50%; background: radial-gradient(circle, rgba(111,169,203,0.22), transparent 60%); }
-.stage-canvas { position: absolute !important; inset: 0; }
+.stage-canvas { position: absolute !important; inset: 0; opacity: 0; transition: opacity 0.9s var(--ease-out, ease-out); }
+.stage-canvas.is-ready { opacity: 1; }
 .stage-veil { position: absolute; inset: 0; background: #fbfcfd; opacity: var(--veil); }
 
 /* Hero sits transparently over the stage */
 .story .hero { background: transparent; position: relative; z-index: 2; min-height: max(720px, 100svh); }
 .story .hero-inner { padding-top: 120px; }
-.hero-badge.lg { border-radius: 999px; }
-.hero-badge-logo { border-radius: 6px; }
 .hero-acr { font-size: clamp(3.8rem, 10vw, 9.4rem); letter-spacing: -0.055em; }
 .hero-theme { font-size: clamp(1.15rem, 1.8vw, 1.6rem); }
 .hero-theme em { color: var(--blue); font-size: 1.12em; }
@@ -262,7 +261,7 @@ body { font-weight: 400; line-height: 1.62; }
 .crumbs ol { letter-spacing: 0; font-weight: 500; text-transform: none; font-size: 0.86rem; }
 
 .count-lbl, .hs-role { font-weight: 600; }
-.rules-no, .acc-no, .ptracks-no, .role-count, .search-count { font-family: var(--font-sans); font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.rules-no, .acc-no, .ptracks-no, .search-count { font-family: var(--font-sans); font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: 0; }
 .rules-no, .acc-no, .ptracks-no { font-size: 0.78rem; }
 .count-num, .tile-num, .explorer-fee, .info-amt, .kpi-v, .orgcard-v, .tier-amount, .fee-table td, .prog-day-date, .tl-date { font-variant-numeric: tabular-nums; }
 .tl-past, .notice-code, .footer-date, .hero-badge strong { font-family: var(--font-sans); font-weight: 500; letter-spacing: 0; }

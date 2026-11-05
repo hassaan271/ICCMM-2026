@@ -148,7 +148,7 @@ export const schedule: Day[] = [
   },
 ];
 
-/** Details the schedule does not yet give; shown on the Event Flow page */
+/** Details the schedule does not yet give (open items for the organisers; no longer shown on the site) */
 export const scheduleGaps = [
   'Halls and rooms for each session',
   'Paper titles and presentation order within each technical session',

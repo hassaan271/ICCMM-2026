@@ -1,42 +1,21 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { guests, guestCategories, keynoteIds, guestById, displayName, type Guest } from '../data/guests';
 import { portraitOf } from '../data/guests/image-sources';
 import { href } from '../utils/routes';
 import { gsap, finePointer, prefersReduced } from '../animations/motion';
-import { Eyebrow, Heading, pad } from '../components/shared/Typography';
+import { Eyebrow, Heading } from '../components/shared/Typography';
 import { PageHeader } from '../components/shared/PageHeader';
 import { GlassPanel } from '../components/glass/GlassPanel';
 import { LiquidButton } from '../components/buttons/LiquidButton';
 import { Portrait } from '../components/guests/Portrait';
 import { GuestDialog } from '../components/guests/GuestDialog';
-import { rolesOf, leadRole } from '../components/guests/guest-roles';
+import { rolesOf, leadRole, profileHref } from '../components/guests/guest-roles';
+import { useProfileDialog } from '../components/guests/useProfileDialog';
 
+// Keynote speakers have their own page; their inaugural roles are noted there and linked from here
 const cat = (id: Guest['category']) => guestCategories.find((c) => c.id === id)!;
 const inCat = (id: Guest['category']) => guests.filter((g) => g.category === id && !keynoteIds.includes(g.id));
 const Designation = ({ g }: { g: Guest }) => (g.designation ? <>{g.designation}</> : <span className="is-pending">Designation to be confirmed</span>);
-
-/* Keynote speakers: large editorial spreads, portrait clipped in on scroll */
-function Keynote({ g, i, open }: { g: Guest; i: number; open: (id: string) => void }) {
-  const slot = rolesOf(g).find((r) => r.label === 'Keynote Speaker');
-  return (
-    <article className={`kn${i % 2 ? ' kn--flip' : ''}`} id={`guest-${g.id}`} aria-labelledby={`kn-${g.id}`}>
-      <figure className="kn-photo" data-clip-reveal="">
-        <span className="kn-photo-in" data-kn-parallax=""><Portrait id={g.id} sizes="(max-width: 900px) 92vw, 520px" /></span>
-      </figure>
-      <div className="kn-text">
-        <p className="kn-no" aria-hidden="true">{pad(i + 1)}</p>
-        <Eyebrow>Keynote {pad(i + 1)}{slot ? ` · ${slot.when}` : ''}</Eyebrow>
-        <h3 className="kn-name" id={`kn-${g.id}`} data-reveal="">{displayName(g)}</h3>
-        <p className="kn-role" data-reveal=""><Designation g={g} /><span>{g.organization}</span></p>
-        {g.bio ? <p className="kn-bio" data-reveal="">{g.bio}</p> : <p className="kn-bio is-pending" data-reveal="">Biography and keynote title to be announced.</p>}
-        <div className="actions" data-reveal="">
-          <button type="button" className="more-btn" onClick={() => open(g.id)}>Full profile</button>
-          {slot && <a className="link-arrow" href={href('programme', slot.item)}>{slot.itemTitle} in the programme →</a>}
-        </div>
-      </div>
-    </article>
-  );
-}
 
 /* Inaugural session: horizontal gallery of portrait cards */
 function Gallery({ list, open }: { list: Guest[]; open: (id: string) => void }) {
@@ -99,7 +78,7 @@ function EditorialList({ list }: { list: Guest[] }) {
         {list.map((g) => <span key={g.id} className={hover === g.id ? 'is-cur' : ''}><Portrait id={g.id} sizes="220px" /></span>)}
       </div>
       <ol className="ed-list">
-        {list.map((g, i) => {
+        {list.map((g) => {
           const open = openId === g.id;
           const roles = rolesOf(g);
           return (
@@ -107,7 +86,6 @@ function EditorialList({ list }: { list: Guest[] }) {
               <div data-reveal="">
               <h3 className="ed-h">
                 <button type="button" className="ed-btn" aria-expanded={open} aria-controls={`ed-${g.id}`} onClick={() => setOpenId(open ? null : g.id)}>
-                  <span className="ed-no">{pad(i + 1)}</span>
                   <span className="ed-name">{displayName(g)}</span>
                   <span className="ed-meta"><span className="ed-role"><Designation g={g} /></span><span className="ed-org">{g.organization}</span></span>
                   <span className="acc-ico" aria-hidden="true" />
@@ -159,59 +137,36 @@ function Grid({ list, open }: { list: Guest[]; open: (id: string) => void }) {
 }
 
 export function Guests() {
-  const [openId, setOpenId] = useState<string | null>(null);
-  const root = useRef<HTMLDivElement>(null);
-  const open = useCallback((id: string) => { setOpenId(id); history.replaceState(null, '', `#guest-${id}`); }, []);
-  const close = useCallback(() => { setOpenId(null); if (location.hash.startsWith('#guest-')) history.replaceState(null, '', location.pathname + location.search); }, []);
+  const { openId, open, close } = useProfileDialog();
 
-  // Deep link: guests.html#guest-<id> opens that profile
-  useEffect(() => {
-    const fromHash = () => { const id = location.hash.replace('#guest-', ''); if (location.hash.startsWith('#guest-') && guestById(id)) setOpenId(id); };
-    const t = setTimeout(fromHash, 400);
-    window.addEventListener('hashchange', fromHash);
-    return () => { clearTimeout(t); window.removeEventListener('hashchange', fromHash); };
-  }, []);
-
-  // Subtle parallax inside the keynote portraits
-  useEffect(() => {
-    if (prefersReduced()) return;
-    const ctx = gsap.context(() => {
-      gsap.utils.toArray<HTMLElement>('[data-kn-parallax]').forEach((el) => {
-        gsap.fromTo(el, { yPercent: -5 }, { yPercent: 5, ease: 'none', scrollTrigger: { trigger: el.parentElement, start: 'top bottom', end: 'bottom top', scrub: true } });
-      });
-    }, root);
-    return () => ctx.revert();
-  }, []);
-
-  const keynotes = keynoteIds.map((id) => guestById(id)!);
   const inaugural = inCat('inaugural');
   const ieee = inCat('ieee');
   const academic = inCat('academic');
-  const total = guests.length;
+  const total = guests.length - keynoteIds.length;
+  // Keynote speakers who also hold an inaugural-session role
+  const alsoInaugural = keynoteIds.map((id) => guestById(id)!).map((g) => ({ g, r: rolesOf(g).find((x) => x.item === 'd1-inaugural') })).filter((x) => x.r);
 
   return (
-    <div ref={root}>
-      <PageHeader eyebrow="Speakers & guests" title="Distinguished" accent="speakers & guests." crumbs={[{ text: 'Speakers & Guests' }]}
-        intro={`Keynote speakers, guests of the inaugural and valedictory sessions, IEEE Hyderabad Section dignitaries and the academic representatives chairing the technical sessions: ${total} confirmed guests across both days.`}
-        subnav={[{ id: 'keynotes', text: 'Keynote speakers' }, { id: 'inaugural', text: 'Inaugural session' }, { id: 'ieee', text: 'IEEE Hyderabad Section' }, { id: 'academic', text: 'Academic representatives' }]} />
-
-      <section className="section" id="keynotes" aria-labelledby="kn-title">
-        <div className="wrap">
-          <div className="section-head">
-            <div><Eyebrow>Keynote speakers</Eyebrow><Heading text="Keynote" accent="addresses." id="kn-title" /></div>
-            <p className="section-intro" data-reveal="">One keynote opens each day of the conference, on 20 and 21 November 2026.</p>
-          </div>
-          <div className="kn-list">{keynotes.map((g, i) => <Keynote key={g.id} g={g} i={i} open={open} />)}</div>
-        </div>
-      </section>
+    <div>
+      <PageHeader eyebrow="Guests" title="Distinguished" accent="guests." crumbs={[{ text: 'Guests' }]}
+        intro={`Guests of the inaugural and valedictory sessions, IEEE Hyderabad Section dignitaries and the academic representatives chairing the technical sessions: ${total} confirmed guests across both days. The keynote speakers are listed on the Speakers page.`}
+        subnav={[{ id: 'inaugural', text: 'Inaugural session' }, { id: 'ieee', text: 'IEEE Hyderabad Section' }, { id: 'academic', text: 'Academic representatives' }]} />
 
       <section className="section section--tint" id="inaugural" aria-labelledby="ina-title">
         <div className="wrap">
           <div className="section-head">
             <div><Eyebrow>{cat('inaugural').title} session</Eyebrow><Heading text="Guests of the" accent="inaugural session." id="ina-title" /></div>
-            <p className="section-intro" data-reveal="">{cat('inaugural').intro} The keynote speakers above also join the session.</p>
+            <p className="section-intro" data-reveal="">{cat('inaugural').intro}</p>
           </div>
           <Gallery list={inaugural} open={open} />
+          {alsoInaugural.length > 0 && (
+            <p className="also-note" data-reveal="">
+              Also joining the inaugural session, from the Speakers page:{' '}
+              {alsoInaugural.map(({ g, r }, i) => (
+                <span key={g.id}>{i > 0 && ' and '}<a href={profileHref(g.id)}>{displayName(g)}</a> ({r!.label})</span>
+              ))}.
+            </p>
+          )}
         </div>
       </section>
 

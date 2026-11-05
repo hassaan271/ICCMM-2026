@@ -1,17 +1,10 @@
-import { Suspense, useMemo, useRef } from 'react';
+import { Suspense, useCallback, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Environment, Lightformer } from '@react-three/drei';
 import { ACESFilmicToneMapping, AdditiveBlending, BufferGeometry, Color, Float32BufferAttribute, PCFSoftShadowMap, Points, type DirectionalLight, type PerspectiveCamera } from 'three';
 import { Processor } from './Processor';
 import { story, poseAt } from '../../animations/story';
 import { pointer, signalBoot } from '../../animations/motion';
-
-// Mounted inside the Suspense boundary, so its first frame means the model and environment are drawn
-function SceneReady() {
-  const sent = useRef(false);
-  useFrame(() => { if (!sent.current) { sent.current = true; requestAnimationFrame(() => signalBoot('scene')); } });
-  return null;
-}
 
 /* Camera follows the scroll pose; the cursor adds a limited orbit on top */
 function CameraRig() {
@@ -91,11 +84,14 @@ function DataField({ count }: { count: number }) {
   );
 }
 
-export default function ProcessorScene({ active }: { active: boolean }) {
+export default function ProcessorScene({ active, onFail }: { active: boolean; onFail: () => void }) {
   const mobile = story.mobile;
+  // The canvas fades in once the model is fully prepared, so it never pops in half-built
+  const [ready, setReady] = useState(false);
+  const onReady = useCallback(() => { setReady(true); signalBoot('scene'); }, []);
   return (
     <Canvas
-      className="stage-canvas"
+      className={`stage-canvas${ready ? ' is-ready' : ''}`}
       frameloop={active ? 'always' : 'never'}
       dpr={mobile ? [1, 1.3] : [1, 1.75]}
       shadows={!mobile ? { type: PCFSoftShadowMap } : false}
@@ -113,9 +109,8 @@ export default function ProcessorScene({ active }: { active: boolean }) {
         </Environment>
         <Lights shadows={!mobile} />
         <CameraRig />
-        <Processor />
+        <Processor onReady={onReady} onFail={onFail} />
         {!mobile && <DataField count={420} />}
-        <SceneReady />
       </Suspense>
     </Canvas>
   );

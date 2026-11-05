@@ -1,19 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
-import { schedule, scheduleGaps, kindLabel, fmtTime, minutes, weekday, type ScheduleItem, type Person, type Lane } from '../data/schedule';
+import { schedule, kindLabel, fmtTime, minutes, weekday, type ScheduleItem, type Person, type Lane } from '../data/schedule';
 import { meta } from '../data/conference';
 import { href } from '../utils/routes';
+import { profileHref } from '../components/guests/guest-roles';
 import { gsap, ScrollTrigger, scrollToTarget, prefersReduced } from '../animations/motion';
 import { Eyebrow, Heading } from '../components/shared/Typography';
 import { PageHeader } from '../components/shared/PageHeader';
 import { GlassPanel } from '../components/glass/GlassPanel';
 import { Segmented } from '../components/shared/Controls';
-import { LiquidButton } from '../components/buttons/LiquidButton';
 
 const dur = (a: string, b: string) => { const m = minutes(a, b); const h = Math.floor(m / 60); return h ? `${h} h${m % 60 ? ` ${m % 60} min` : ''}` : `${m} min`; };
 const sessionCount = (items: ScheduleItem[]) => items.reduce((n, i) => n + (i.lanes?.length ?? 0), 0);
 
 function Who({ p }: { p: Person }) {
-  const name = p.guest ? <a className="ef-person-n" href={href('guests', `guest-${p.guest}`)}>{p.name}</a> : <span className="ef-person-n">{p.name}</span>;
+  const name = p.guest ? <a className="ef-person-n" href={profileHref(p.guest)}>{p.name}</a> : <span className="ef-person-n">{p.name}</span>;
   return (
     <span className="ef-person">
       {p.role && <span className="ef-person-r">{p.role}</span>}
@@ -179,23 +179,6 @@ export function EventFlow() {
           </div>
         </section>
       ))}
-
-      <section className="section section--tint" id="to-confirm" aria-labelledby="tc-title">
-        <div className="wrap cols-2">
-          <div>
-            <Eyebrow>Still to be published</Eyebrow>
-            <Heading text="Details" accent="to follow." id="tc-title" />
-            <p className="section-intro" data-reveal="">The schedule above is complete for times and sessions. These details have not been issued yet and will be added when the organisers confirm them.</p>
-            <div className="actions" data-reveal="">
-              <LiquidButton href={href('guests')}>Speakers &amp; guests</LiquidButton>
-              <LiquidButton href={`mailto:${meta.email}?subject=${encodeURIComponent('ICCMM-26 programme')}`} variant="glass">Ask the organisers</LiquidButton>
-            </div>
-          </div>
-          <GlassPanel kind="light" as="ul" className="ef-gaps" data-reveal="">
-            {scheduleGaps.map((g) => <li key={g}><span className="ef-gap-dot" aria-hidden="true" />{g}</li>)}
-          </GlassPanel>
-        </div>
-      </section>
     </div>
   );
 }

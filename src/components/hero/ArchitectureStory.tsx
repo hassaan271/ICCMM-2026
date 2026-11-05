@@ -1,7 +1,7 @@
-import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Component, lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { meta, about, aboutShort, tracks, supporters } from '../../data/conference';
 import { href } from '../../utils/routes';
-import { gsap, ScrollTrigger, prefersReduced, isMobile, onBootDone } from '../../animations/motion';
+import { gsap, ScrollTrigger, prefersReduced, isMobile, onBootDone, signalBoot } from '../../animations/motion';
 import { story, keys, poseAt } from '../../animations/story';
 import { Eyebrow, Words } from '../shared/Typography';
 import { LiquidButton, RegisterButton } from '../buttons/LiquidButton';
@@ -9,6 +9,15 @@ import { TrackIcon } from '../shared/Icons';
 import { LiquidGlass } from '../glass/LiquidGlass';
 
 const ProcessorScene = lazy(() => import('../processor/ProcessorScene'));
+
+// The 3D scene is optional: if WebGL is unavailable or the chunk fails to load, the stage keeps its
+// lit backdrop and the rest of the page carries on, instead of the whole app unmounting.
+class SceneBoundary extends Component<{ onFail: () => void; children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch() { this.props.onFail(); }
+  render() { return this.state.failed ? null : this.props.children; }
+}
 
 // Same keys/text as LABELS in Processor.tsx; positioned every frame from the 3D anchors
 const chipLabels = [
@@ -77,6 +86,9 @@ export function ArchitectureStory() {
   const stage = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(true);
   const [ready, setReady] = useState(false);
+  const [sceneFailed, setSceneFailed] = useState(false);
+  // Release the loading screen straight away rather than waiting for a scene that won't arrive
+  const onSceneFail = useCallback(() => { setSceneFailed(true); signalBoot('scene'); }, []);
 
   useLayoutEffect(() => {
     story.mobile = isMobile();
@@ -161,10 +173,12 @@ export function ArchitectureStory() {
         <div className="stage-bg" />
         <div className="stage-grid" data-depth="0.12" />
         <div className="stage-glow" data-depth="0.6" />
-        {ready && (
-          <Suspense fallback={null}>
-            <ProcessorScene active={active} />
-          </Suspense>
+        {ready && !sceneFailed && (
+          <SceneBoundary onFail={onSceneFail}>
+            <Suspense fallback={null}>
+              <ProcessorScene active={active} onFail={onSceneFail} />
+            </Suspense>
+          </SceneBoundary>
         )}
         <div className="chip-labels">
           {chipLabels.map(([k, t]) => (
@@ -179,20 +193,25 @@ export function ArchitectureStory() {
       <section className="hero" aria-labelledby="hero-title">
         <div className="wrap hero-inner">
           <div className="hero-copy">
-            <LiquidGlass as="p" className="hero-badge" tint="clear" refraction={10} blur={1.5} data-intro="">
-              <img src="assets/logos/logo-ieee.webp" width={233} height={131} alt="IEEE" className="hero-badge-logo" />
-              <span>Conference ID <strong>#{meta.conferenceId}</strong></span>
-            </LiquidGlass>
-            <p className="eyebrow hero-eyebrow" data-intro="">{meta.edition}</p>
+            {/* Acronym first, then the full title as an editorial block, then the dates */}
             <h1 className="hero-title" id="hero-title">
               <span className="visually-hidden">{meta.acronym}: {meta.edition} {meta.title}</span>
               <span className="hero-acr" aria-hidden="true">{letters('ICCMM')}<span className="hero-char hero-dash"><span className="hero-char-i">-26</span></span></span>
             </h1>
-            <p className="hero-theme" aria-hidden="true" data-intro=""><em>Next-Gen Computing:</em> Converging Microelectronics and Mechatronics for Transformative Solutions</p>
-            <dl className="hero-facts" data-intro="">
-              <div><dt>Dates</dt><dd>20–21 November 2026</dd></div>
-              <div><dt>Venue</dt><dd>Muffakham Jah College of Engineering and Technology, Hyderabad</dd></div>
-            </dl>
+            <div className="hero-name" aria-hidden="true" data-intro="">
+              <p className="hero-edition">{meta.edition}</p>
+              <p className="hero-theme"><em>{meta.titleShort}:</em> {meta.titleRest}</p>
+            </div>
+            <p className="hero-date" data-intro=""><time dateTime="2026-11-20">20–21 November 2026</time></p>
+            <div className="hero-meta" data-intro="">
+              <dl className="hero-facts">
+                <div><dt>Venue</dt><dd>Muffakham Jah College of Engineering and Technology, Hyderabad</dd></div>
+              </dl>
+              <LiquidGlass as="dl" className="hero-id" tint="clear" refraction={10} blur={1.5}>
+                <dt>Conference ID</dt>
+                <dd>{meta.conferenceId}</dd>
+              </LiquidGlass>
+            </div>
             <div className="hero-ctas" data-intro="">
               <RegisterButton />
               <LiquidButton href={href('cfp')} variant="glass">Call for Papers</LiquidButton>

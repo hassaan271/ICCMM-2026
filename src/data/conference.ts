@@ -17,8 +17,8 @@ export const meta = {
   address: 'Mount Pleasant, 8-2-249 to 267, Road No. 3, Banjara Hills, Hyderabad - 500 034, Telangana State, India',
   email: 'iccmm@mjcollege.ac.in',
   website: 'https://iccmm.mjcollege.ac.in/',
-  // Numbers exactly as printed in the conference brochure.
-  phones: ['+91 98889810626', '+91 9959129564', '+91 9948439301'],
+  // Contact numbers. The first was printed as 98889810626 in the brochure; corrected to 8889810626.
+  phones: ['+91 8889810626', '+91 9959129564', '+91 9948439301'],
   copyright: 'Copyright ©2025 ICCMM-2026. All Rights Reserved.',
 };
 
@@ -30,9 +30,13 @@ export const links = {
   cmt: 'https://cmt3.research.microsoft.com/ICCMM2026',
   ieeeTemplates: 'https://www.ieee.org/conferences/publishing/templates',
   aiReportForm: 'https://forms.gle/hJTAHkTAThpgi4Zt6',
-  // INTEGRATION POINT: the source mentions a "Conference Registration Form" but gives no URL.
-  // Set this to the live form URL and every registration button switches to it automatically.
+  // INTEGRATION POINT (Google Form): the source mentions a "Conference Registration Form" but gives no URL.
+  // Set this to the live Google Form URL (e.g. the forms.gle link) and every registration button,
+  // including the form on the Registration page, switches to it automatically.
   registrationForm: null as string | null,
+  // Optional: the Google Form's pre-fill field ids (Form menu → "Get pre-filled link"), e.g. 'entry.123456789'.
+  // When set, the Full Name and Mobile Number entered on the Registration page are carried into the Google Form.
+  registrationFormFields: { name: null as string | null, mobile: null as string | null },
   maps: 'https://www.google.com/maps/search/?api=1&query=' +
     encodeURIComponent('Muffakham Jah College of Engineering and Technology, Road No. 3, Banjara Hills, Hyderabad 500034'),
   mapsEmbed: 'https://maps.google.com/maps?q=' +
@@ -351,14 +355,21 @@ export const fees = {
     { id: 'academician', label: 'Academician' },
     { id: 'researcher', label: 'Researcher / Industrialist' },
   ],
+  // Technical event fees (INR). Poster Presentation is one total fee per team of up to 3 participants.
   other: [
-    { label: 'Attendee', fee: '2000' },
-    { label: 'Poster Presentation', fee: '2000 upto 2 participants / 1000 per participant' },
-    { label: 'Best PhD / M.Tech Thesis Presentation', fee: '2000' },
-  ],
+    { label: 'Attendee', amount: 1000, unit: 'per person', note: null },
+    { label: 'Poster Presentation', amount: 3000, unit: 'per team', note: 'Up to 3 participants' },
+    { label: 'Best PhD / M.Tech Thesis Presentation', amount: 1000, unit: 'per person', note: null },
+  ] as { label: string; amount: number; unit: 'per person' | 'per team'; note: string | null }[],
   gstNote: '* : excluding GST',
   extraPages: 'The regular fee will be charged upto 6 pages and after that extra fee charges will be applicable beyond 6 pages (up to 2 additional pages). The extra page charge: 1200/page (for Indian Author) and $25/page ( for Foreign authors).',
 };
+
+// Display form of a technical event fee: "₹1,000 per person", "₹3,000 / Team"
+export const eventFee = (f: (typeof fees.other)[number]) => ({
+  price: `₹${f.amount.toLocaleString('en-IN')}`,
+  unit: f.unit === 'per team' ? '/ Team' : 'per person',
+});
 
 export const committee = [
   { role: 'Chief Patron', people: [['Janab Zafar Javeed', 'Hony Secretary, SUES']] },
@@ -439,7 +450,7 @@ export const faq = [
   { q: 'How are papers reviewed?', a: 'Each paper undergoes peer review by at least three independent referees from the conference review panel, and every submission is checked for plagiarism as per IEEE plagiarism policy.' },
   { q: 'What similarity limits apply to the camera-ready paper?', a: 'Similarity index below 20% excluding references, no more than 4% from any single source, and an AI-generated content score below 20% (only a Turnitin report is acceptable).' },
   { q: 'Do I need to register to present?', a: 'Yes. Only registered delegates are permitted to attend and present, at least one author must register and present the paper, and certificates are issued only to registered participants who attend or present.' },
-  { q: 'Where can I find the programme and the keynote speakers?', a: 'The day-by-day schedule is on the Programme & Event Flow page, and the keynote speakers, inaugural guests and session chairs are on the Speakers & Guests page.' },
+  { q: 'Where can I find the programme and the keynote speakers?', a: 'The day-by-day schedule is on the Programme & Event Flow page. The keynote speakers are on the Speakers page, and the inaugural guests and session chairs are on the Guests page.' },
 ];
 
 // Short homepage copy, condensed from the "About the Conference" text above.
@@ -451,6 +462,19 @@ export const aboutShort =
 export const portraits = {
   'Syed Ferhathullah Hussainy': 'assets/images/portrait-syed-ferhathullah-hussainy.webp',
   'Mohd. Hamraj': 'assets/images/portrait-mohd-hamraj.webp',
+};
+
+// Committee members who are also published ICCMM-26 guests (same name and institution in both sources).
+// Their organiser-supplied guest portrait is reused; see data/guests/image-sources.ts for its source record.
+export const committeeGuestIds: Record<string, string> = {
+  'Janab Zafar Javeed': 'zafar-javeed',
+  'MGPL Narayana': 'mgpl-narayana',
+  'Marina Tropmann Frick': 'marina-tropmann-frick',
+  'M A Jabbar': 'ma-jabbar',
+  'Dr. K. Jaya Sankar': 'k-jaya-sankar',
+  'C. Thirmal': 'c-thirmal',
+  'Sanju Tiwari': 'sanju-tiwari',
+  'Jyoti Singhai': 'jyoti-singhai',
 };
 
 export const supporters = [
