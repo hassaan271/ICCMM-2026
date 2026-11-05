@@ -5,6 +5,7 @@ import './styles/base.css';
 import './styles/sections.css';
 import './styles/interface.css';
 import './styles/glass.css';
+import './styles/pages.css';
 
 // Each .html entry sets <body data-page="…">; the same app renders the matching page.
 const page = (document.body.dataset.page as PageKey) || 'home';

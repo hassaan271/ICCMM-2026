@@ -156,23 +156,13 @@
 
 /* Speakers */
 .speakers { background: var(--white); border-block: 1px solid var(--line); }
-.speaker-pending { position: relative; }
 .speaker-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
 .speaker-photo { aspect-ratio: 4 / 5; border-radius: var(--radius-l); overflow: hidden; background: var(--gray-100); margin-bottom: 16px; }
 .speaker-photo img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(0.2); transition: transform 1s var(--ease-out), filter 0.6s; }
 .speaker:hover .speaker-photo img { transform: scale(1.04); filter: none; }
-.speaker-photo--empty { position: relative; background: linear-gradient(160deg, var(--gray-100), var(--blue-50)); border: 1px dashed rgba(10,111,165,.25); }
-.speaker-photo--empty span { position: absolute; left: 50%; bottom: 0; width: 56%; aspect-ratio: 1 / 1.25; transform: translateX(-50%); border-radius: 50% 50% 18px 18px / 40% 40% 18px 18px; background: linear-gradient(180deg, rgba(10,111,165,.1), rgba(10,111,165,.03)); }
-.speaker-photo--empty::after { content: ''; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,.7) 50%, transparent 65%); animation: shimmer 3.6s ease-in-out infinite; }
 
 .speaker-name { font-size: 1.15rem; font-weight: 700; color: var(--ink); }
 .speaker-role, .speaker-inst { color: var(--muted); font-size: 0.92rem; }
-.notice-card { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%); width: min(520px, 90%); border-radius: var(--radius-l); padding: 28px 30px; }
-.notice-dot { position: absolute; right: 26px; top: 28px; width: 10px; height: 10px; border-radius: 50%; background: var(--blue); animation: pulse 2s ease-in-out infinite; }
-.notice-card .label { color: var(--blue); margin-bottom: 8px; }
-.notice-text { font-size: clamp(1.2rem, 1.8vw, 1.55rem); font-weight: 650; letter-spacing: -0.02em; color: var(--ink); line-height: 1.25; margin-bottom: 10px; }
-.notice-sub { color: var(--muted); font-size: 0.92rem; }
-@media (max-width: 760px) { .speaker-grid--empty { grid-template-columns: 1fr 1fr; } .speaker-grid--empty li:nth-child(3) { display: none; } .notice-card { position: relative; left: 0; top: 0; transform: none; width: 100%; margin-top: -40px; } }
 
 /* Programme */
 
@@ -468,5 +458,4 @@
   66% { border-radius: 37% 63% 51% 49% / 37% 35% 65% 63%; transform: translate(3%, -2%) rotate(-20deg); }
 }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-@keyframes shimmer { 0% { transform: translateX(-100%); } 60%, 100% { transform: translateX(100%); } }
 @keyframes ping { 0% { transform: scale(0.4); opacity: 0.9; } 100% { transform: scale(2.4); opacity: 0; } }

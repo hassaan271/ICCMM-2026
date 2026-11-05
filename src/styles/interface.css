@@ -68,7 +68,6 @@
 .nav-link:hover, .nav-item.is-open > .nav-link { background: transparent; }
 .drop.lg { border-radius: 20px; position: absolute; }
 .map-load.lg { position: absolute; }
-@media (min-width: 761px) { .notice-card.lg { position: absolute; } }
 
 /* ───────── Story stage ───────── */
 .story { position: relative; }
@@ -280,8 +279,6 @@ body { font-weight: 400; line-height: 1.62; }
 .brand-logo { height: 34px; width: auto; display: block; }
 .brand { gap: 12px; }
 
-/* Empty programme day */
-.prog-empty { padding: 26px 0 6px; font-size: 1.05rem; font-weight: 500; color: var(--graphite); }
 
 /* Quieter backdrop: a faint grid only, no animated traces */
 .stage-grid { opacity: 0.7; }

@@ -32,6 +32,10 @@ export function ConferenceFooter() {
         <nav className="footer-col" aria-label="Footer">
           <p className="label">Conference</p>
           <ul className="footer-links">
+            <li><a href={href('about')}>About the Conference</a></li>
+            <li><a href={href('programme')}>Programme &amp; Event Flow</a></li>
+            <li><a href={href('guests')}>Speakers &amp; Guests</a></li>
+            <li><a href={href('tracks')}>Technical Tracks</a></li>
             <li><a href={href('cfp')}>Call for Papers</a></li>
             <li><a href={href('registration')}>Registration</a></li>
             <li><a href={href('events')}>Technical Events</a></li>

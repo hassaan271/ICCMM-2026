@@ -4,7 +4,14 @@ import { Environment, Lightformer } from '@react-three/drei';
 import { ACESFilmicToneMapping, AdditiveBlending, BufferGeometry, Color, Float32BufferAttribute, PCFSoftShadowMap, Points, type DirectionalLight, type PerspectiveCamera } from 'three';
 import { Processor } from './Processor';
 import { story, poseAt } from '../../animations/story';
-import { pointer } from '../../animations/motion';
+import { pointer, signalBoot } from '../../animations/motion';
+
+// Mounted inside the Suspense boundary, so its first frame means the model and environment are drawn
+function SceneReady() {
+  const sent = useRef(false);
+  useFrame(() => { if (!sent.current) { sent.current = true; requestAnimationFrame(() => signalBoot('scene')); } });
+  return null;
+}
 
 /* Camera follows the scroll pose; the cursor adds a limited orbit on top */
 function CameraRig() {
@@ -108,6 +115,7 @@ export default function ProcessorScene({ active }: { active: boolean }) {
         <CameraRig />
         <Processor />
         {!mobile && <DataField count={420} />}
+        <SceneReady />
       </Suspense>
     </Canvas>
   );

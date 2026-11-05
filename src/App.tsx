@@ -1,6 +1,6 @@
 import { useEffect, type ReactElement } from 'react';
 import type { PageKey } from './utils/routes';
-import { initSmoothScroll, initPointer, initReveals, initGlassHighlights, initTilt, initDepthParallax, initClipReveals, initCounters, scrollToTarget, getLenis, ScrollTrigger } from './animations/motion';
+import { initSmoothScroll, initPointer, initReveals, initGlassHighlights, initTilt, initDepthParallax, initClipReveals, initCounters, scrollToTarget, getLenis, ScrollTrigger, signalBoot } from './animations/motion';
 import { ConferenceNavigation } from './components/navigation/ConferenceNavigation';
 import { ConferenceFooter } from './components/footer/ConferenceFooter';
 import { FloatingRegister } from './components/footer/FloatingRegister';
@@ -12,9 +12,13 @@ import { Committee } from './pages/Committee';
 import { Events } from './pages/Events';
 import { Sponsors } from './pages/Sponsors';
 import { Venue } from './pages/Venue';
+import { About } from './pages/About';
+import { Tracks } from './pages/Tracks';
+import { Guests } from './pages/Guests';
+import { EventFlow } from './pages/EventFlow';
 
 const PAGES: Record<PageKey, () => ReactElement> = {
-  home: Home, cfp: CallForPapers, registration: Registration, committee: Committee, events: Events, sponsors: Sponsors, venue: Venue,
+  home: Home, about: About, tracks: Tracks, guests: Guests, programme: EventFlow, cfp: CallForPapers, registration: Registration, committee: Committee, events: Events, sponsors: Sponsors, venue: Venue,
 };
 
 // Hash links pointing at the current page scroll smoothly instead of jumping
@@ -61,6 +65,7 @@ export function App({ page }: { page: PageKey }) {
     if (document.readyState === 'complete') settle(); else window.addEventListener('load', settle, { once: true });
     document.fonts?.ready.then(() => ScrollTrigger.refresh());
     (window as unknown as { __iccmmReady: boolean }).__iccmmReady = true;
+    signalBoot('app');
     return () => { stopReveals(); stopGlass(); };
   }, []);
 

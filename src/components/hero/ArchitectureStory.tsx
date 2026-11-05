@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { meta, about, aboutShort, tracks, supporters } from '../../data/conference';
 import { href } from '../../utils/routes';
-import { gsap, ScrollTrigger, prefersReduced, isMobile } from '../../animations/motion';
+import { gsap, ScrollTrigger, prefersReduced, isMobile, onBootDone } from '../../animations/motion';
 import { story, keys, poseAt } from '../../animations/story';
 import { Eyebrow, Words } from '../shared/Typography';
 import { LiquidButton, RegisterButton } from '../buttons/LiquidButton';
@@ -87,6 +87,7 @@ export function ArchitectureStory() {
   useEffect(() => {
     const el = root.current!;
     const st = stage.current!;
+    let stopBoot = () => {};
     const ctx = gsap.context(() => {
       // Map each chapter's centre to a pose key, so the 3D sequence lines up with the text
       const measure = () => {
@@ -120,7 +121,8 @@ export function ArchitectureStory() {
       });
 
       // Opening sequence: lights up, camera settles, title resolves, details follow
-      const tl = gsap.timeline({ delay: 0.15 });
+      const tl = gsap.timeline({ delay: 0.15, paused: true });
+      stopBoot = onBootDone(() => tl.play());
       if (story.reduced) {
         story.intro = 1;
         gsap.set('.hero-char-i', { y: 0, yPercent: 0 });
@@ -149,7 +151,7 @@ export function ArchitectureStory() {
     }, el);
     const onResize = () => ScrollTrigger.refresh();
     window.addEventListener('load', onResize);
-    return () => { ctx.revert(); window.removeEventListener('load', onResize); document.documentElement.classList.remove('nav-on-dark'); };
+    return () => { stopBoot(); ctx.revert(); window.removeEventListener('load', onResize); document.documentElement.classList.remove('nav-on-dark'); };
   }, []);
 
   return (

@@ -9,7 +9,7 @@ import { GlassPanel } from '../glass/GlassPanel';
 
 type Item = { text: string; url: string; key: string; children?: { text: string; url: string; note: string }[] };
 export const navTree: Item[] = [
-  { text: 'About', url: href('home', 'about'), key: 'about' },
+  { text: 'About', url: href('about'), key: 'about' },
   {
     text: 'Call for Papers', url: href('cfp'), key: 'cfp', children: [
       { text: 'Research Tracks', url: href('cfp', 'tracks'), note: 'Four tracks and their research areas' },
@@ -18,9 +18,9 @@ export const navTree: Item[] = [
       { text: 'Technical Events & Posters', url: href('events'), note: 'Special Poster Session' },
     ],
   },
-  { text: 'Tracks', url: href('home', 'tracks'), key: 'tracks' },
-  { text: 'Speakers', url: href('home', 'speakers'), key: 'speakers' },
-  { text: 'Programme', url: href('home', 'programme'), key: 'programme' },
+  { text: 'Tracks', url: href('tracks'), key: 'tracks' },
+  { text: 'Speakers', url: href('guests'), key: 'speakers' },
+  { text: 'Programme', url: href('programme'), key: 'programme' },
   {
     text: 'Registration', url: href('registration'), key: 'registration', children: [
       { text: 'Categories & Fees', url: href('registration'), note: 'Indian and international delegates' },
@@ -36,7 +36,7 @@ export const navTree: Item[] = [
   { text: 'Venue', url: href('venue'), key: 'venue' },
 ];
 
-const currentKey: Partial<Record<PageKey, string>> = { cfp: 'cfp', events: 'cfp', registration: 'registration', sponsors: 'registration', committee: 'committee', venue: 'venue' };
+const currentKey: Partial<Record<PageKey, string>> = { home: 'home', about: 'about', tracks: 'tracks', guests: 'speakers', programme: 'programme', cfp: 'cfp', events: 'cfp', registration: 'registration', sponsors: 'registration', committee: 'committee', venue: 'venue' };
 
 export function ConferenceNavigation({ page }: { page: PageKey }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -132,7 +132,7 @@ export function ConferenceNavigation({ page }: { page: PageKey }) {
                     </GlassPanel>
                   </li>
                 ) : (
-                  <li key={n.key} className="nav-item"><a className="nav-link" href={n.url} data-nav-link={n.key}>{n.text}</a></li>
+                  <li key={n.key} className="nav-item"><a className={`nav-link${cur === n.key ? ' is-current' : ''}`} href={n.url} data-nav-link={n.key} aria-current={cur === n.key ? 'page' : undefined}>{n.text}</a></li>
                 )
               )}
             </ul>
@@ -153,7 +153,7 @@ export function ConferenceNavigation({ page }: { page: PageKey }) {
             <ul className="menu-list">
               {[{ text: 'Home', url: href('home'), key: 'home' } as Item, ...navTree].map((n, i) => (
                 <li key={n.key} style={{ ['--i' as string]: i }}>
-                  <a href={n.url} onClick={() => setMenuOpen(false)}>{n.text}</a>
+                  <a href={n.url} onClick={() => setMenuOpen(false)} className={cur === n.key ? 'is-current' : undefined} aria-current={cur === n.key ? 'page' : undefined}>{n.text}</a>
                   {n.children && <ul className="menu-sub">{n.children.map((c) => <li key={c.text}><a href={c.url} onClick={() => setMenuOpen(false)}>{c.text}</a></li>)}</ul>}
                 </li>
               ))}

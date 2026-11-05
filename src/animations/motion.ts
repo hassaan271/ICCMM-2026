@@ -10,6 +10,17 @@ export const finePointer = () => window.matchMedia('(hover: hover) and (pointer:
 export const isCoarse = () => window.matchMedia('(pointer: coarse)').matches;
 export const isMobile = () => isCoarse() || window.matchMedia('(max-width: 760px)').matches;
 
+/* ───────── Loading screen hand-off ─────────
+   The boot screen (components/loading/boot-screen.html) sets window.__bootDone and fires
+   'iccmm:boot-done' as it starts to leave. Intro animations wait for it so they aren't played behind it. */
+export function onBootDone(cb: () => void) {
+  const w = window as unknown as { __bootDone?: boolean };
+  if (w.__bootDone || !document.getElementById('boot')) { cb(); return () => {}; }
+  window.addEventListener('iccmm:boot-done', cb, { once: true });
+  return () => window.removeEventListener('iccmm:boot-done', cb);
+}
+export const signalBoot = (step: 'app' | 'scene') => window.dispatchEvent(new Event(`iccmm:${step}`));
+
 /* ───────── Smooth scrolling ───────── */
 let lenis: Lenis | null = null;
 export function initSmoothScroll() {

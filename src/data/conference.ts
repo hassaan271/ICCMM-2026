@@ -1,4 +1,5 @@
-// All conference content lives here. Source: iccmm26_website_data.md
+// Conference content. Source: iccmm26_website_data.md
+// Guests: data/guests/ · Schedule: data/schedule.ts (both from the organisers' November documents)
 // Edit this file to update the site; sections only handle presentation.
 
 export const meta = {
@@ -429,7 +430,6 @@ export const sponsorTiers = [
   { tier: 'Brass', amount: 'Rs. 15,000/-', benefits: ['Flyer in Registration Kit', 'Presence during Inaugural session'] },
 ];
 
-export const pendingNotice = 'This content will be updated one month prior to the Conference.';
 
 // Questions are framing only; every answer is quoted or condensed from the source document.
 export const faq = [
@@ -439,28 +439,12 @@ export const faq = [
   { q: 'How are papers reviewed?', a: 'Each paper undergoes peer review by at least three independent referees from the conference review panel, and every submission is checked for plagiarism as per IEEE plagiarism policy.' },
   { q: 'What similarity limits apply to the camera-ready paper?', a: 'Similarity index below 20% excluding references, no more than 4% from any single source, and an AI-generated content score below 20% (only a Turnitin report is acceptable).' },
   { q: 'Do I need to register to present?', a: 'Yes. Only registered delegates are permitted to attend and present, at least one author must register and present the paper, and certificates are issued only to registered participants who attend or present.' },
-  { q: 'When are the keynote speakers and programme announced?', a: 'This content will be updated one month prior to the Conference.' },
+  { q: 'Where can I find the programme and the keynote speakers?', a: 'The day-by-day schedule is on the Programme & Event Flow page, and the keynote speakers, inaugural guests and session chairs are on the Speakers & Guests page.' },
 ];
 
 // Short homepage copy, condensed from the "About the Conference" text above.
 export const aboutShort =
   'ICCMM-26 is organised to address emerging challenges and promote intelligent, future-ready solutions. Over two days it unites experts, researchers and innovators from academia, R&D and industry across computing, microelectronics and mechatronics.';
-
-// ── Keynote speakers ─────────────────────────────────────────────
-// Empty until the organisers announce them. Add entries like:
-// { name: '', designation: '', institution: '', bio: '', photo: 'assets/images/speaker-name.webp' }
-export const speakers = [];
-
-// ── Conference programme ─────────────────────────────────────────
-// Add sessions as { time: '09:30', title: '', venue: '', type: 'Keynote' }.
-export const programme = [
-  { label: 'Day 01', date: '20 November 2026', iso: '2026-11-20', sessions: [] },
-  {
-    label: 'Day 02', date: '21 November 2026', iso: '2026-11-21',
-    // Confirmed in the source ("Poster Presentation: 21st November 2026"); time not yet published.
-    sessions: [{ time: null, title: 'Poster Presentation', type: 'Special Poster Session' }],
-  },
-];
 
 // Portraits supplied with the site assets whose identity is confirmed
 // (file name or nameplate) and who appear in the ICCMM-26 committee.

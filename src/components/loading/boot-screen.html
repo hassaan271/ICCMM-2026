@@ -1,0 +1,144 @@
+<!-- ICCMM-26 loading screen. Injected into every page by the bootScreen() plugin in vite.config.ts,
+     so it paints before the app bundle arrives. Shown once per browser session (sessionStorage). -->
+<style>
+  #boot { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; background: #f7f9fa; color: #14181c;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif; overflow: hidden;
+    clip-path: inset(0 0 0 0); transition: clip-path 0.9s cubic-bezier(0.65, 0, 0.35, 1), visibility 0s linear 0.9s; }
+  html.no-js #boot, html.boot-skip #boot { display: none; }
+  html.is-booting, html.is-booting body { overflow: hidden; }
+  #boot.is-out { clip-path: inset(0 0 100% 0); visibility: hidden; }
+  .boot-bg { position: absolute; inset: 0; background: radial-gradient(60% 55% at 50% 42%, #e3f0f8 0%, rgba(234, 244, 250, 0) 70%); }
+  .boot-grid { position: absolute; inset: -64px; background-image: linear-gradient(rgba(10, 111, 165, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(10, 111, 165, 0.07) 1px, transparent 1px);
+    background-size: 64px 64px; -webkit-mask-image: radial-gradient(50% 50% at 50% 45%, #000, transparent 78%); mask-image: radial-gradient(50% 50% at 50% 45%, #000, transparent 78%); }
+  .boot-core { position: relative; display: grid; justify-items: center; gap: 0; padding: 24px; text-align: center; width: min(560px, 100%);
+    transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s; }
+  #boot.is-out .boot-core { transform: translateY(-40px) scale(0.97); opacity: 0; }
+  .boot-chip { width: clamp(150px, 34vw, 210px); height: auto; overflow: visible; margin-bottom: 30px; }
+  .boot-chip .pkg { fill: #fff; stroke: rgba(20, 24, 28, 0.14); stroke-width: 1; filter: drop-shadow(0 18px 30px rgba(10, 60, 100, 0.16)); }
+  .boot-chip .die { fill: url(#bootDie); }
+  .boot-chip .die-line { stroke: rgba(255, 255, 255, 0.35); stroke-width: 0.6; }
+  .boot-chip .pin { stroke: #b9c2ca; stroke-width: 2.4; stroke-linecap: round; }
+  .boot-chip .trace { fill: none; stroke: rgba(10, 111, 165, 0.22); stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
+  .boot-chip .pulse { fill: none; stroke: #0a6fa5; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 0.08 1; stroke-dashoffset: 1.08; animation: bootPulse 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
+  .boot-chip .pulse:nth-of-type(2n) { animation-delay: -0.8s; }
+  .boot-chip .pulse:nth-of-type(3n) { animation-delay: -1.6s; }
+  .boot-chip .node { fill: #fff; stroke: #0a6fa5; stroke-width: 1.2; }
+  .boot-chip .glint { fill: url(#bootGlint); animation: bootGlint 2.8s ease-in-out infinite; transform-box: fill-box; }
+  .boot-chip .core-dot { fill: #fff; animation: bootBeat 1.6s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+  .boot-acr { display: inline-flex; font-size: clamp(2.6rem, 9vw, 4.2rem); font-weight: 800; letter-spacing: -0.05em; line-height: 0.95; margin: 0 0 10px; }
+  .boot-acr span { display: inline-block; opacity: 0; transform: translateY(60%); filter: blur(8px); animation: bootIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards; animation-delay: calc(0.12s + var(--i) * 0.05s); }
+  .boot-acr .dash { color: #0a6fa5; }
+  .boot-sub { margin: 0 0 30px; font-size: 0.95rem; color: #3a4148; letter-spacing: -0.005em; opacity: 0; animation: bootFade 0.9s ease 0.55s forwards; }
+  .boot-sub em { font-family: 'Instrument Serif', Georgia, serif; font-size: 1.12em; color: #0a6fa5; }
+  .boot-meter { display: grid; gap: 10px; width: min(300px, 80vw); padding: 14px 16px 12px; border-radius: 18px; opacity: 0; animation: bootFade 0.8s ease 0.75s forwards;
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.5)); -webkit-backdrop-filter: blur(14px) saturate(160%); backdrop-filter: blur(14px) saturate(160%);
+    box-shadow: inset 0 1px 1px #fff, inset 0 0 0 1px rgba(20, 24, 28, 0.06), 0 14px 34px -18px rgba(10, 40, 66, 0.35); }
+  .boot-track { position: relative; height: 3px; border-radius: 3px; background: #e1e6ea; overflow: hidden; }
+  .boot-fill { position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(90deg, #6fa9cb, #0a6fa5); transform-origin: 0 50%; transform: scaleX(var(--p, 0.04)); transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+  .boot-row { display: flex; justify-content: space-between; gap: 12px; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #58626b; }
+  .boot-row b { font-weight: 600; color: #0a6fa5; font-variant-numeric: tabular-nums; letter-spacing: 0; }
+  @keyframes bootPulse { to { stroke-dashoffset: 0; } }
+  @keyframes bootGlint { 0%, 100% { opacity: 0; transform: translateX(-30%); } 50% { opacity: 1; transform: translateX(30%); } }
+  @keyframes bootBeat { 0%, 100% { opacity: 0.55; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1); } }
+  @keyframes bootIn { to { opacity: 1; transform: none; filter: none; } }
+  @keyframes bootFade { to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) {
+    #boot { transition: opacity 0.4s, visibility 0s linear 0.4s; clip-path: none; }
+    #boot.is-out { clip-path: none; opacity: 0; }
+    #boot *, #boot *::before { animation: none !important; }
+    .boot-acr span, .boot-sub, .boot-meter { opacity: 1; transform: none; filter: none; }
+    .boot-chip .pulse { stroke-dasharray: none; stroke-dashoffset: 0; opacity: 0.5; }
+    .boot-chip .glint { opacity: 0; }
+  }
+</style>
+<div id="boot" role="status" aria-live="polite" aria-label="Loading ICCMM-26">
+  <div class="boot-bg" aria-hidden="true"></div>
+  <div class="boot-grid" aria-hidden="true"></div>
+  <div class="boot-core">
+    <svg class="boot-chip" viewBox="0 0 240 240" aria-hidden="true">
+      <defs>
+        <linearGradient id="bootDie" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b74ab" /><stop offset="0.55" stop-color="#085d8b" /><stop offset="1" stop-color="#064a70" /></linearGradient>
+        <linearGradient id="bootGlint" x1="0" y1="0" x2="1" y2="1"><stop offset="0.3" stop-color="#fff" stop-opacity="0" /><stop offset="0.5" stop-color="#fff" stop-opacity="0.45" /><stop offset="0.7" stop-color="#fff" stop-opacity="0" /></linearGradient>
+      </defs>
+      <!-- circuit traces leaving the package -->
+      <g>
+        <path class="trace" d="M120 64V18h-34" /><path class="trace" d="M98 64V34H40V8" /><path class="trace" d="M142 64V30h58" />
+        <path class="trace" d="M176 120h46v-40" /><path class="trace" d="M176 100h28V54" /><path class="trace" d="M176 142h50" />
+        <path class="trace" d="M120 176v48h40" /><path class="trace" d="M142 176v30h56v28" /><path class="trace" d="M98 176v40H44" />
+        <path class="trace" d="M64 120H16v46" /><path class="trace" d="M64 140H34v60" /><path class="trace" d="M64 98H12" />
+      </g>
+      <g>
+        <path class="pulse" pathLength="1" d="M120 64V18h-34" /><path class="pulse" pathLength="1" d="M176 120h46v-40" /><path class="pulse" pathLength="1" d="M120 176v48h40" />
+        <path class="pulse" pathLength="1" d="M64 120H16v46" /><path class="pulse" pathLength="1" d="M142 64V30h58" /><path class="pulse" pathLength="1" d="M98 176v40H44" />
+      </g>
+      <circle class="node" cx="86" cy="18" r="3" /><circle class="node" cx="222" cy="80" r="3" /><circle class="node" cx="160" cy="224" r="3" /><circle class="node" cx="16" cy="166" r="3" />
+      <circle class="node" cx="200" cy="30" r="3" /><circle class="node" cx="44" cy="216" r="3" />
+      <!-- pins -->
+      <g class="pin">
+        <path d="M84 58v6M98 58v6M112 58v6M128 58v6M142 58v6M156 58v6" /><path d="M84 176v6M98 176v6M112 176v6M128 176v6M142 176v6M156 176v6" />
+        <path d="M58 84h6M58 98h6M58 112h6M58 128h6M58 142h6M58 156h6" /><path d="M176 84h6M176 98h6M176 112h6M176 128h6M176 142h6M176 156h6" />
+      </g>
+      <rect class="pkg" x="64" y="64" width="112" height="112" rx="14" />
+      <rect class="die" x="86" y="86" width="68" height="68" rx="6" />
+      <path class="die-line" d="M97 86v68M109 86v68M120 86v68M131 86v68M143 86v68M86 97h68M86 109h68M86 131h68M86 143h68" />
+      <rect class="glint" x="86" y="86" width="68" height="68" rx="6" />
+      <rect class="core-dot" x="113" y="113" width="14" height="14" rx="3" />
+    </svg>
+    <p class="boot-acr" aria-label="ICCMM-26"><span style="--i:0">I</span><span style="--i:1">C</span><span style="--i:2">C</span><span style="--i:3">M</span><span style="--i:4">M</span><span class="dash" style="--i:5">-</span><span style="--i:6">2</span><span style="--i:7">6</span></p>
+    <p class="boot-sub"><em>Next-Gen Computing</em> · 20–21 November 2026 · MJCET, Hyderabad</p>
+    <div class="boot-meter">
+      <div class="boot-track"><span class="boot-fill"></span></div>
+      <div class="boot-row"><span class="boot-step">Loading typography</span><b class="boot-count">0 / 0</b></div>
+    </div>
+  </div>
+</div>
+<script>
+  (function () {
+    var boot = document.getElementById('boot');
+    var html = document.documentElement;
+    if (!boot) return;
+    if (html.classList.contains('boot-skip')) { boot.remove(); window.__bootDone = true; return; }
+    html.classList.add('is-booting');
+    // Real milestones only. The bar moves when one finishes; nothing is simulated.
+    var home = document.body.getAttribute('data-page') === 'home';
+    var tasks = [
+      { id: 'fonts', label: 'Loading typography' },
+      { id: 'app', label: 'Starting interface' }
+    ];
+    if (home) tasks.push({ id: 'scene', label: 'Rendering processor' });
+    tasks.push({ id: 'media', label: 'Loading images' });
+    var done = {}, finished = false, t0 = performance.now(), appAt = 0;
+    var fill = boot.querySelector('.boot-fill'), step = boot.querySelector('.boot-step'), count = boot.querySelector('.boot-count');
+    function render() {
+      var n = 0, next = null;
+      for (var i = 0; i < tasks.length; i++) { if (done[tasks[i].id]) n++; else if (!next) next = tasks[i]; }
+      fill.style.setProperty('--p', Math.max(0.04, n / tasks.length));
+      count.textContent = n + ' / ' + tasks.length;
+      step.textContent = next ? next.label : 'Ready';
+      return n === tasks.length;
+    }
+    function finish() {
+      if (finished) return;
+      finished = true;
+      try { sessionStorage.setItem('iccmm-boot', '1'); } catch (e) {}
+      boot.classList.add('is-out');
+      html.classList.remove('is-booting');
+      window.__bootDone = true;
+      window.dispatchEvent(new Event('iccmm:boot-done'));
+      setTimeout(function () { boot.remove(); }, 1000);
+    }
+    function mark(id) {
+      if (done[id] || finished) return;
+      done[id] = true;
+      if (id === 'app') { appAt = performance.now(); setTimeout(finish, 2200); } // don't wait long on non-essentials
+      if (render()) setTimeout(finish, Math.max(0, 1100 - (performance.now() - t0)) + 250);
+    }
+    render();
+    (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(function () { mark('fonts'); });
+    window.addEventListener('iccmm:app', function () { mark('app'); });
+    window.addEventListener('iccmm:scene', function () { mark('scene'); });
+    if (document.readyState === 'complete') mark('media'); else window.addEventListener('load', function () { mark('media'); });
+    if (window.__iccmmReady) mark('app');
+    setTimeout(finish, 7000); // failsafe: never hold the page
+  })();
+</script>
