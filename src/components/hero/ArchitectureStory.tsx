@@ -29,11 +29,11 @@ type Track = (typeof tracks)[number];
 const byNo = (no: string) => tracks.find((t) => t.no === no)!;
 
 // Chapters that run over the processor, in the order the layers are revealed
-// (about → heat spreader, 02 → interconnect, 01 → silicon die, 03 → substrate and contacts, 04 → reassembly)
+// (about → heat spreader, 01 → interconnect, 02 → silicon die, 03 → substrate and contacts, 04 → reassembly)
 const chapters: { id: string; name: string; side: 'left' | 'right'; dark?: boolean; track?: Track }[] = [
   { id: 'about', name: 'About', side: 'right' },
-  { id: 'track-02', name: 'Track 02', side: 'left', track: byNo('02') },
-  { id: 'track-01', name: 'Track 01', side: 'right', dark: true, track: byNo('01') },
+  { id: 'track-01', name: 'Track 01', side: 'left', track: byNo('01') },
+  { id: 'track-02', name: 'Track 02', side: 'right', dark: true, track: byNo('02') },
   { id: 'track-03', name: 'Track 03', side: 'left', dark: true, track: byNo('03') },
   { id: 'track-04', name: 'Track 04', side: 'right', track: byNo('04') },
 ];
@@ -241,8 +241,8 @@ export function ArchitectureStory() {
       </section>
 
       {chapters.map((c, i) => (
-        <section key={c.id} id={c.id === 'track-02' ? 'tracks' : c.id} className={`chapter chapter--${c.side}${c.dark ? ' chapter--dark' : ''}`} data-chapter aria-label={c.name}>
-          {c.id === 'track-02' && <span id="track-02" />}
+        <section key={c.id} id={c.id === 'track-01' ? 'tracks' : c.id} className={`chapter chapter--${c.side}${c.dark ? ' chapter--dark' : ''}`} data-chapter aria-label={c.name}>
+          {c.id === 'track-01' && <span id="track-01" />}
           <div className="wrap chapter-inner">
             <LiquidGlass as="article" tint={c.dark ? 'dark' : 'frost'} className="ch-panel" refraction={30} blur={9} bezel={34}>
               {c.track ? <TrackChapter t={c.track} /> : <AboutChapter />}
