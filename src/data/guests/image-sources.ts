@@ -63,8 +63,8 @@ export const guestImages: Record<string, GuestImage> = Object.fromEntries(([
   supplied('k-jaya-sankar', 'image15.png', 196, 245, { lowRes: true }),
   supplied('jyoti-singhai', 'image9.png', 409, 511),
   {
-    guest: 'krishna-reddy-p', status: 'organiser-supplied', source: 'Photograph supplied directly by the ICCMM-26 organisers (Stage 8)', sourceUrl: null,
-    license: LICENSE, attribution: null, verification: 'Supplied by the organisers as the portrait of Prof. P. Krishna Reddy.', w: 520, h: 650, focus: '50% 35%',
+    guest: 'krishna-reddy-p', status: 'organiser-supplied', source: 'HD photograph supplied directly by the ICCMM-26 organisers (Nov 2026; replaces the Stage 8 photo)', sourceUrl: null,
+    license: LICENSE, attribution: null, verification: 'Supplied by the organisers as the portrait of Prof. P. Krishna Reddy.', w: 720, h: 900, focus: '50% 30%',
   },
 ] as GuestImage[]).map((i) => [i.guest, i]));
 

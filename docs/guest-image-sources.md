@@ -25,7 +25,7 @@ All published portraits are taken from **Guest Info.docx**, supplied by the ICCM
 | Dr. Y. Vijayalatha Reddy | image5.png | none | Organiser-supplied; guest consent to confirm | none stated | Row match | 400×500 |
 | Dr. K. Jaya Sankar | image15.png | none | Organiser-supplied; guest consent to confirm | none stated | Row match | 196×245 **low-res** |
 | Dr. Jyoti Singhai | image9.png | none | Organiser-supplied; guest consent to confirm | none stated | Row match | 409×511 |
-| Prof. Krishna Reddy P. | photo supplied directly by the organisers (Stage 8) | none | Organiser-supplied; guest consent to confirm | none stated | Supplied as his portrait | 650×650 source, cropped to 520×650 |
+| Prof. Krishna Reddy P. | photo supplied directly by the organisers (Stage 8) | none | Organiser-supplied; guest consent to confirm | none stated | Supplied as his portrait | HD source 1122×1402 (Nov 2026), cropped to 720×900 |
 
 Not published (marked NO, or unverified): Joginder Tanikella (image7), Sreenivas Jasti (image6), Bala Prasad Peddigari (image2) and "Dr. Merugu Laxmi" (image21). None of these files were copied into the project.
 
