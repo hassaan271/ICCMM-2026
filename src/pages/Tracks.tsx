@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { tracks } from '../data/conference';
+import { tracks, pageText, fillText } from '../data/conference';
 import { trackSessions, fmtTime, weekday } from '../data/schedule';
 import { href } from '../utils/routes';
 import { Eyebrow, Words } from '../components/shared/Typography';
@@ -18,8 +18,8 @@ export function Tracks() {
 
   return (
     <>
-      <PageHeader eyebrow="Technical tracks" title="Four tracks," accent="one convergence." crumbs={[{ text: 'Technical Tracks' }]}
-        intro="Original research papers and case studies are invited in computing, microelectronics and mechatronics. Each track below lists its research areas and the sessions in which it is presented."
+      <PageHeader eyebrow={pageText.tracks.eyebrow} title={pageText.tracks.title} accent={pageText.tracks.accent} crumbs={[{ text: 'Technical Tracks' }]}
+        intro={fillText(pageText.tracks.intro)}
         subnav={tracks.map((t) => ({ id: `track-${t.no}`, text: `Track ${t.no}` }))} />
 
       <section className="section" aria-label="Technical tracks">

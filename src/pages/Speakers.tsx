@@ -3,6 +3,7 @@ import { keynoteIds, guestById, displayName, type Guest } from '../data/guests';
 import { href } from '../utils/routes';
 import { gsap, prefersReduced } from '../animations/motion';
 import { Eyebrow, Heading, pad } from '../components/shared/Typography';
+import { pageText, fillText } from '../data/conference';
 import { PageHeader } from '../components/shared/PageHeader';
 import { LiquidButton } from '../components/buttons/LiquidButton';
 import { Portrait } from '../components/guests/Portrait';
@@ -24,7 +25,7 @@ function Keynote({ g, i }: { g: Guest; i: number }) {
         <p className="kn-no" aria-hidden="true">{pad(i + 1)}</p>
         <Eyebrow>Keynote {pad(i + 1)}{slot ? ` · ${slot.when}` : ''}</Eyebrow>
         <h3 className="kn-name" id={`kn-${g.id}`} data-reveal="">{displayName(g)}</h3>
-        <p className="kn-role" data-reveal=""><Designation g={g} /><span>{g.organization}</span></p>
+        <p className="kn-role" data-reveal=""><Designation g={g} /><span className="kn-org">{g.organization}</span>{g.location && <span className="kn-loc"><svg className="loc-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" /><circle cx="12" cy="10" r="2.3" /></svg>{g.location}</span>}</p>
         {g.bio ? <p className="kn-bio" data-reveal="">{g.bio}</p> : <p className="kn-bio is-pending" data-reveal="">Biography and keynote title to be announced.</p>}
         {also.length > 0 && <p className="kn-also" data-reveal="">Also {also.map((r) => `${r.label} · ${r.itemTitle}`).join('; ')}.</p>}
         {slot && <div className="actions" data-reveal=""><a className="link-arrow" href={href('programme', slot.item)}>{slot.itemTitle} in the programme →</a></div>}
@@ -51,8 +52,8 @@ export function Speakers() {
 
   return (
     <div ref={root}>
-      <PageHeader eyebrow="Speakers" title="Keynote" accent="speakers." crumbs={[{ text: 'Speakers' }]}
-        intro="The confirmed keynote speakers of ICCMM-26. One keynote address opens each day of the conference, on 20 and 21 November 2026." />
+      <PageHeader eyebrow={pageText.speakers.eyebrow} title={pageText.speakers.title} accent={pageText.speakers.accent} crumbs={[{ text: 'Speakers' }]}
+        intro={fillText(pageText.speakers.intro)} />
 
       <section className="section" id="keynotes" aria-labelledby="kn-title">
         <div className="wrap">

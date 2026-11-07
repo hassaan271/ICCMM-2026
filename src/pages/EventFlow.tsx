@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { schedule, kindLabel, fmtTime, minutes, weekday, paperGuideline, type ScheduleItem, type Person, type Lane, type Day } from '../data/schedule';
-import { meta } from '../data/conference';
+import { meta, pageText, fillText } from '../data/conference';
 import { profileHref } from '../components/guests/guest-roles';
 import { scrollToTarget } from '../animations/motion';
 import { Eyebrow, Heading } from '../components/shared/Typography';
 import { PageHeader } from '../components/shared/PageHeader';
 import { GlassPanel } from '../components/glass/GlassPanel';
 import { Segmented } from '../components/shared/Controls';
-import { ArrowIcon } from '../components/shared/Icons';
 
 /* Event flow as an editorial conference programme: a time column and a content column per entry,
    grouped into morning / afternoon / evening, separated by hairlines. Ceremonies and keynotes sit on
@@ -45,25 +44,8 @@ function Session({ l }: { l: Lane }) {
         {(l.room || l.online) && <div><dt>Room</dt><dd className="pg-session-v">{l.room ?? 'Online session'}</dd></div>}
         {l.chair && <div><dt>Chair</dt><dd><Who p={l.chair} showRole={false} /></dd></div>}
         {l.coChair && <div><dt>Co-chair</dt><dd><Who p={l.coChair} showRole={false} /></dd></div>}
-        {l.incharge && <div><dt>In-charge</dt><dd className="pg-session-v">{l.incharge}</dd></div>}
         {l.people && <div><dt>Presenters</dt><dd className="pg-session-people">{l.people.map((p) => <Who key={p.name} p={p} showRole={false} />)}</dd></div>}
       </dl>
-      {l.papers && (
-        <details className="pg-papers">
-          <summary><span>{l.papers.length} papers</span><span className="pg-papers-hint">Show presentation order</span></summary>
-          <ol className="pg-paper-list">
-            {l.papers.map((p) => (
-              <li key={p.id} className="pg-paper">
-                <time className="pg-paper-t" dateTime={p.start}>{fmtTime(p.start).replace(' AM', '').replace(' PM', '')}</time>
-                <div>
-                  <p className="pg-paper-title">{p.title}</p>
-                  <p className="pg-paper-meta">{p.authors}<span> · Paper ID {p.id}</span></p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </details>
-      )}
     </li>
   );
 }
@@ -127,8 +109,8 @@ export function EventFlow() {
 
   return (
     <div ref={root}>
-      <PageHeader eyebrow="Programme" title="Event" accent="flow." crumbs={[{ text: 'Programme & Event Flow' }]}
-        intro={`Two days at ${meta.institution}: the inaugural session and keynotes, parallel paper sessions, the poster presentation, a panel discussion and the valedictory. Times are IST, as issued by the organisers on 29 October 2026.`} />
+      <PageHeader eyebrow={pageText.programme.eyebrow} title={pageText.programme.title} accent={pageText.programme.accent} crumbs={[{ text: 'Programme & Event Flow' }]}
+        intro={fillText(pageText.programme.intro)} />
 
       <section className="section ef-intro" aria-labelledby="efo-title">
         <div className="wrap">
@@ -149,7 +131,6 @@ export function EventFlow() {
           </div>
           <div className="pg-doc" data-reveal="">
             <p className="pg-doc-t">{paperGuideline}</p>
-            <a className="link-row" href="assets/docs/ICCMM-26-track-schedule.pdf" target="_blank" rel="noopener">Full track schedule with all papers (PDF) <ArrowIcon external /></a>
           </div>
         </div>
       </section>

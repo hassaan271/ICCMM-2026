@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { fees, links, eventFee } from '../data/conference';
+import { fees, links, eventFee, pageText, fillText } from '../data/conference';
 import { Eyebrow, Heading } from '../components/shared/Typography';
 import { GlassPanel } from '../components/glass/GlassPanel';
 import { Segmented } from '../components/shared/Controls';
@@ -62,8 +62,8 @@ function FeeFinder() {
 export function Registration() {
   return (
     <>
-      <PageHeader eyebrow="Registration" title="Registration" accent="categories & fees." crumbs={[{ text: 'Registration' }]}
-        intro="Only registered delegates are permitted to attend and present at the conference. At least one author must register and present the paper."
+      <PageHeader eyebrow={pageText.registration.eyebrow} title={pageText.registration.title} accent={pageText.registration.accent} crumbs={[{ text: 'Registration' }]}
+        intro={fillText(pageText.registration.intro)}
         subnav={[{ id: 'fees', text: 'Fee finder' }, { id: 'tables', text: 'All categories' }, { id: 'register', text: 'How to register' }]} />
 
       <section className="section" id="fees" aria-labelledby="fees-title">

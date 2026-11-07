@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { posterSession, posterDates, meta, fees, eventFee } from '../data/conference';
+import { posterSession, posterDates, meta, fees, eventFee, posters, pageText, fillText } from '../data/conference';
 import { href } from '../utils/routes';
 import { lockScroll } from '../animations/motion';
 import { Accordion } from '../components/shared/Controls';
@@ -8,10 +8,6 @@ import { GlassPanel } from '../components/glass/GlassPanel';
 import { LiquidButton } from '../components/buttons/LiquidButton';
 import { PageHeader } from '../components/shared/PageHeader';
 import { Timeline, Caveat } from '../components/shared/Timeline';
-
-const posters = [
-  { src: 'assets/images/call-for-posters', caption: 'Call for Posters', alt: 'ICCMM-26 Call for Posters, 20–21 November 2026: Sustainable and Intelligent Technologies for Transformative Solutions. Poster tracks, submission guidelines (250–300 word abstract to iccmm@mjcollege.ac.in), poster presentation, who should submit, and important dates: abstract deadline 10 November 2026, acceptance 12 November, registration 13 November, presentation 21 November 2026. Venue: MJCET, Banjara Hills, Hyderabad.' },
-];
 
 function Lightbox({ item, onClose }: { item: (typeof posters)[number]; onClose: () => void }) {
   const close = useRef<HTMLButtonElement>(null);
@@ -37,7 +33,7 @@ export function Events() {
   const opener = useRef<HTMLButtonElement[]>([]);
   return (
     <>
-      <PageHeader eyebrow="Technical event" title="Special" accent="poster session." intro={posterSession.intro}
+      <PageHeader eyebrow={pageText.events.eyebrow} title={pageText.events.title} accent={pageText.events.accent} intro={fillText(pageText.events.intro) || posterSession.intro}
         crumbs={[{ text: 'Call for Papers', url: href('cfp') }, { text: 'Technical Events' }]}
         subnav={[{ id: 'theme', text: 'Theme & tracks' }, { id: 'guidelines', text: 'Guidelines' }, { id: 'posters-official', text: 'Official poster' }, { id: 'poster-dates', text: 'Published dates' }]} />
 
@@ -91,7 +87,7 @@ export function Events() {
             {posters.map((p, i) => (
               <figure className="poster-fig" key={p.src} data-reveal="">
                 <button className="poster-btn" type="button" ref={(b) => { if (b) opener.current[i] = b; }} onClick={() => setOpen(i)} aria-label={`Enlarge: ${p.caption}`}>
-                  <img src={`${p.src}-560.webp`} srcSet={`${p.src}-560.webp 560w, ${p.src}.webp 1131w`} sizes="(max-width: 700px) 90vw, 30vw" width={560} height={792} alt={p.alt} loading="lazy" />
+                  <img src={`${p.src}-560.webp`} srcSet={`${p.src}-560.webp 560w, ${p.src}.webp ${p.w ?? 1131}w`} sizes="(max-width: 700px) 90vw, 30vw" width={560} height={p.w && p.h ? Math.round((560 * p.h) / p.w) : 792} alt={p.alt} loading="lazy" />
                   <span className="poster-zoom" aria-hidden="true">Enlarge</span>
                 </button>
                 <figcaption>{p.caption}</figcaption>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { guests, displayName, type Guest, type GuestRole } from '../data/guests';
+import { guests, confirmedGuests, displayName, type Guest, type GuestRole } from '../data/guests';
+import { pageText, fillText } from '../data/conference';
 import { portraitOf } from '../data/guests/image-sources';
 import { href } from '../utils/routes';
 import { gsap, finePointer, prefersReduced } from '../animations/motion';
@@ -64,12 +65,19 @@ function Gallery({ list, open, label, anchor }: { list: Entry[]; open: (id: stri
       <ul className="gal-rail" ref={rail} aria-label={label}>
         {list.map(({ g, role }, i) => (
           <li key={g.id} id={anchor(g.id)} className="gal-item" data-reveal="" style={{ ['--d' as string]: `${Math.min(i, 6) * 70}ms` }}>
+            {g.placeholder ? (
+              <div className="gcard gcard--tba">
+                <span className="gcard-photo"><Portrait id={g.id} sizes="(max-width: 760px) 70vw, 300px" /></span>
+              </div>
+            ) : (
             <button type="button" className="gcard" onClick={() => open(g.id)} aria-label={`${displayName(g)}, ${role.label}. Open profile`}>
               <span className="gcard-photo"><Portrait id={g.id} sizes="(max-width: 760px) 70vw, 300px" /></span>
               <span className="gcard-badge">{role.label.split(' · ')[0]}</span>
               <span className="gcard-name">{displayName(g)}</span>
               <span className="gcard-role"><Designation g={g} /></span>
+              {g.location && <span className="gcard-loc"><svg className="loc-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" /><circle cx="12" cy="10" r="2.3" /></svg>{g.location}</span>}
             </button>
+            )}
           </li>
         ))}
       </ul>
@@ -149,6 +157,7 @@ function Grid({ list, open, anchor }: { list: Entry[]; open: (id: string) => voi
             <GlassPanel kind="frost" as="span" className="gtile-info" refraction={12} blur={6}>
               <span className="gtile-name">{displayName(g)}</span>
               <span className="gtile-org">{g.organization}</span>
+              {g.location && <span className="gtile-org">{g.location}</span>}
               <span className="gtile-x"><span><span className="gtile-r">{role.label} · {role.when}</span></span></span>
             </GlassPanel>
           </button>
@@ -162,14 +171,16 @@ export function Guests() {
   const { openId, open, close } = useProfileDialog();
 
   const blocks = sessions.map((s) => ({ ...s, list: entriesFor(s.match, s.id === 'session-chairs') })).filter((s) => s.list.length > 0);
-  // Profile links point at #guest-<id>; only the first appearance carries the anchor
-  const seen = new Set<string>();
-  const anchor = (id: string) => (seen.has(id) ? undefined : (seen.add(id), `guest-${id}`));
+  // Profile links point at #guest-<id>; only the first appearance carries the anchor.
+  // Worked out once here (not during child renders, which can repeat) so the ids stay stable.
+  const owner = new Map<string, string>();
+  blocks.forEach((s) => s.list.forEach(({ g }) => { if (!owner.has(g.id)) owner.set(g.id, s.id); }));
+  const anchorFor = (section: string) => (id: string) => (owner.get(id) === section ? `guest-${id}` : undefined);
 
   return (
     <div>
-      <PageHeader eyebrow="Guests & speakers" title="Distinguished" accent="guests." crumbs={[{ text: 'Guests' }]}
-        intro={`Guests and speakers of ICCMM-26 in programme order: inaugural session, keynote sessions, session chairs, panel discussion and valedictory. ${guests.length} confirmed guests across both days.`}
+      <PageHeader eyebrow={pageText.guests.eyebrow} title={pageText.guests.title} accent={pageText.guests.accent} crumbs={[{ text: 'Guests' }]}
+        intro={fillText(pageText.guests.intro, { guestCount: confirmedGuests.length })}
         subnav={blocks.map((s) => ({ id: s.id, text: s.eyebrow }))} />
 
       {blocks.map((s, i) => (
@@ -179,9 +190,9 @@ export function Guests() {
               <div><Eyebrow>{pad(i + 1)} · {s.eyebrow}</Eyebrow><Heading text={s.title} accent={s.accent} id={`${s.id}-title`} /></div>
               <p className="section-intro" data-reveal="">{s.intro}</p>
             </div>
-            {s.view === 'gallery' && <Gallery list={s.list} open={open} label={`${s.eyebrow}: guests`} anchor={anchor} />}
-            {s.view === 'grid' && <Grid list={s.list} open={open} anchor={anchor} />}
-            {s.view === 'list' && <EditorialList list={s.list} anchor={anchor} />}
+            {s.view === 'gallery' && <Gallery list={s.list} open={open} label={`${s.eyebrow}: guests`} anchor={anchorFor(s.id)} />}
+            {s.view === 'grid' && <Grid list={s.list} open={open} anchor={anchorFor(s.id)} />}
+            {s.view === 'list' && <EditorialList list={s.list} anchor={anchorFor(s.id)} />}
             {s.id === 'keynote' && <div className="actions mt" data-reveal=""><LiquidButton href={href('speakers')} variant="glass">Keynote speakers page</LiquidButton></div>}
             {i === blocks.length - 1 && <div className="actions mt" data-reveal=""><LiquidButton href={href('programme')}>See the event flow</LiquidButton></div>}
           </div>

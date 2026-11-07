@@ -1,4 +1,4 @@
-import { tracks, callForPapers, authorGuide, links, importantDates, meta } from '../data/conference';
+import { tracks, callForPapers, authorGuide, links, importantDates, meta, pageText, fillText, documents } from '../data/conference';
 import { Accordion, Rules } from '../components/shared/Controls';
 import { Eyebrow, Heading, pad } from '../components/shared/Typography';
 import { LiquidButton } from '../components/buttons/LiquidButton';
@@ -37,7 +37,7 @@ const Steps = () => (
 export function CallForPapers() {
   return (
     <>
-      <PageHeader eyebrow="Call for Papers" title="Call for" accent="papers." intro={callForPapers.intro} crumbs={[{ text: 'Call for Papers' }]}
+      <PageHeader eyebrow={pageText.cfp.eyebrow} title={pageText.cfp.title} accent={pageText.cfp.accent} intro={fillText(pageText.cfp.intro) || callForPapers.intro} crumbs={[{ text: 'Call for Papers' }]}
         subnav={[{ id: 'tracks', text: 'Research tracks' }, { id: 'submission', text: 'Submission' }, { id: 'camera-ready', text: 'Camera-ready' }, { id: 'publication', text: 'Publication' }, { id: 'dates', text: 'Published dates' }]} />
 
       <section className="section" id="tracks" aria-labelledby="t-title">
@@ -107,6 +107,13 @@ export function CallForPapers() {
             <p className="lead">{callForPapers.publication}</p>
             <p className="muted mt-s">{authorGuide.publication}</p>
             <p className="invite">{callForPapers.invitation}</p>
+            {documents.length > 0 && (
+              <ul className="doc-list">
+                {documents.map((d) => (
+                  <li key={d.file}><a className="link-arrow" href={d.file} target="_blank" rel="noopener">{d.title} ↓</a>{d.description && <span className="muted"> · {d.description}</span>}</li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       </section>

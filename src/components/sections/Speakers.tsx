@@ -1,4 +1,4 @@
-import { keynoteIds, guestById, displayName, guests } from '../../data/guests';
+import { keynoteIds, guestById, displayName, confirmedGuests } from '../../data/guests';
 import { href } from '../../utils/routes';
 import { Eyebrow, Heading } from '../shared/Typography';
 import { GlassPanel } from '../glass/GlassPanel';
@@ -18,7 +18,7 @@ export function SpeakerShowcase() {
             <Eyebrow>Speakers</Eyebrow>
             <Heading text="Keynote" accent="speakers." id="speakers-title" />
           </div>
-          <p className="section-intro" data-reveal="">One keynote address opens each day of the conference. The inaugural session, IEEE Hyderabad Section and session chairs bring {guests.length - keynoteIds.length} further confirmed guests.</p>
+          <p className="section-intro" data-reveal="">One keynote address opens each day of the conference. The inaugural session, IEEE Hyderabad Section and session chairs bring {confirmedGuests.length - keynoteIds.length} further confirmed guests.</p>
         </div>
         <ul className="speaker-grid speaker-grid--keynotes">
           {featured.map((g) => {
@@ -32,6 +32,7 @@ export function SpeakerShowcase() {
                     <h3 className="speaker-name">{displayName(g)}</h3>
                     <p className="speaker-role">{g.designation ?? 'Designation to be confirmed'}</p>
                     <p className="speaker-inst">{g.organization}</p>
+                    {g.location && <p className="speaker-loc"><svg className="loc-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" /><circle cx="12" cy="10" r="2.3" /></svg>{g.location}</p>}
                   </GlassPanel>
                 </a>
               </li>

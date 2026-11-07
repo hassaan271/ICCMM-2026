@@ -1,3 +1,16 @@
 node_modules/
 dist/
 .claude/
+# CMS local data and secrets
+.cms-data/
+.env
+.env.local
+.env.*.local
+.vercel
+
+# CMS local data and secrets
+.cms-data/
+.env
+.env.local
+.env.*.local
+.vercel

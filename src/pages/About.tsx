@@ -1,6 +1,6 @@
-import { about, meta, organizers, sponsorsLine, importantDates } from '../data/conference';
+import { about, meta, organizers, sponsorsLine, importantDates, pageText, fillText } from '../data/conference';
 import { schedule } from '../data/schedule';
-import { guests, keynoteIds } from '../data/guests';
+import { confirmedGuests, keynoteIds } from '../data/guests';
 import { href } from '../utils/routes';
 import { Eyebrow, Heading, pad } from '../components/shared/Typography';
 import { PageHeader } from '../components/shared/PageHeader';
@@ -11,14 +11,14 @@ import { ArrowIcon } from '../components/shared/Icons';
 
 const explore = [
   { url: href('programme'), label: 'Programme', t: 'Event flow', d: `Two days, ${schedule.reduce((n, d) => n + d.items.length, 0)} programme items, as issued by the organisers.` },
-  { url: href('speakers'), label: 'People', t: 'Speakers & guests', d: `${keynoteIds.length} keynote speakers, plus ${guests.length - keynoteIds.length} confirmed guests and session chairs on the Guests page.` },
+  { url: href('speakers'), label: 'People', t: 'Speakers & guests', d: `${keynoteIds.length} keynote speakers, plus ${confirmedGuests.length - keynoteIds.length} confirmed guests and session chairs on the Guests page.` },
   { url: href('tracks'), label: 'Research', t: 'Technical tracks', d: 'Four tracks across computing, microelectronics and mechatronics.' },
 ];
 
 export function About() {
   return (
     <>
-      <PageHeader eyebrow="About the conference" title="About" accent="ICCMM-26." intro={about.lead}
+      <PageHeader eyebrow={pageText.about.eyebrow} title={pageText.about.title} accent={pageText.about.accent} intro={fillText(pageText.about.intro) || about.lead}
         crumbs={[{ text: 'About' }]}
         subnav={[{ id: 'overview', text: 'Overview' }, { id: 'organisers', text: 'Organisers' }, { id: 'key-dates', text: 'Key dates' }, { id: 'explore', text: 'Explore' }]} />
 

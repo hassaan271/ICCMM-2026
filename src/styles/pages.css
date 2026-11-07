@@ -64,7 +64,8 @@
 .kn-no { position: absolute; right: 0; top: -0.5em; font-family: var(--font-serif); font-style: italic; font-size: clamp(5rem, 12vw, 11rem); line-height: 1; color: rgba(10, 111, 165, 0.1); pointer-events: none; }
 .kn-name { font-size: clamp(2rem, 4.2vw, 3.6rem); font-weight: 750; letter-spacing: -0.045em; line-height: 1.02; color: var(--ink); margin-bottom: 16px; max-width: 16ch; text-wrap: balance; }
 .kn-role { display: grid; gap: 2px; font-weight: 600; color: var(--ink); margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
-.kn-role > span:last-child { font-weight: 450; color: var(--muted); }
+.kn-role > .kn-org { font-weight: 450; color: var(--muted); }
+.kn-role > .kn-loc { margin-top: 6px; }
 .kn-bio { color: var(--graphite); max-width: 58ch; font-size: 1.04rem; }
 .kn-also { margin-top: 14px; max-width: 58ch; font-size: 0.95rem; color: var(--muted); }
 .kn .actions { align-items: center; gap: 12px 28px; }
@@ -83,6 +84,10 @@
 .gcard-badge { justify-self: start; font-size: 0.74rem; font-weight: 600; color: var(--blue); background: var(--blue-50); padding: 4px 10px; border-radius: 999px; }
 .gcard-name { font-size: 1.08rem; font-weight: 650; letter-spacing: -0.02em; color: var(--ink); line-height: 1.25; }
 .gcard-role { font-size: 0.88rem; color: var(--muted); line-height: 1.4; }
+.gcard-loc, .gdlg-loc, .kn-loc, .speaker-loc { display: inline-flex; align-items: center; gap: 6px; font-size: 0.86rem; font-weight: 550; color: var(--blue); line-height: 1.4; }
+.loc-ico { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
+.gdlg-loc { margin-top: 6px; }
+.speaker-loc { margin-top: 4px; }
 .gal-ctrl { display: flex; gap: 8px; justify-content: flex-end; }
 .gal-btn { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: var(--white); border: 1px solid var(--gray-200); color: var(--ink); transition: background 0.3s, color 0.3s, border-color 0.3s, opacity 0.3s; }
 .gal-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
@@ -273,3 +278,6 @@ a.pg-person-n:hover { color: var(--blue); text-decoration-color: currentColor; }
 /* Cross-reference under the inaugural gallery (keynote speakers who also join the session) */
 .also-note { margin-top: 26px; max-width: 70ch; color: var(--muted); }
 .also-note a { color: var(--blue); font-weight: 600; text-decoration: underline; text-decoration-color: rgba(10,111,165,.35); text-underline-offset: 3px; }
+
+/* CMS downloads list (Call for Papers → Publication); renders only when documents are added in /admin */
+.doc-list { list-style: none; margin: 1.25rem 0 0; padding: 0; display: grid; gap: .5rem; }

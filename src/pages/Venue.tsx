@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { meta, links, organizers } from '../data/conference';
+import { meta, links, organizers, pageText, fillText } from '../data/conference';
 import { Eyebrow, Heading } from '../components/shared/Typography';
 import { GlassPanel } from '../components/glass/GlassPanel';
 import { Img } from '../components/shared/Img';
@@ -57,8 +57,8 @@ function VenueMap() {
 export function Venue() {
   return (
     <>
-      <PageHeader eyebrow="Venue & travel" title="Venue" accent="& contact." crumbs={[{ text: 'Venue & Contact' }]}
-        intro={`ICCMM-26 takes place at ${meta.institution}, Banjara Hills, Hyderabad, on 20–21 November 2026.`}
+      <PageHeader eyebrow={pageText.venue.eyebrow} title={pageText.venue.title} accent={pageText.venue.accent} crumbs={[{ text: 'Venue & Contact' }]}
+        intro={fillText(pageText.venue.intro)}
         subnav={[{ id: 'campus', text: 'Campus' }, { id: 'map', text: 'Map' }, { id: 'contact-us', text: 'Contact us' }]} />
 
       <section className="section" id="campus" aria-labelledby="campus-title">

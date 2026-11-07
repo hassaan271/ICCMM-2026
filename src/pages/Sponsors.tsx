@@ -1,4 +1,4 @@
-import { sponsorTiers, supporters, meta } from '../data/conference';
+import { sponsorTiers, supporters, meta, pageText, fillText } from '../data/conference';
 import { Eyebrow, Heading } from '../components/shared/Typography';
 import { GlassPanel } from '../components/glass/GlassPanel';
 import { LiquidButton } from '../components/buttons/LiquidButton';
@@ -9,8 +9,8 @@ const allBenefits = [...new Set(sponsorTiers.flatMap((t) => t.benefits))];
 export function Sponsors() {
   return (
     <>
-      <PageHeader eyebrow="Sponsors & exhibitors" title="Sponsorship" accent="categories." crumbs={[{ text: 'Registration', url: 'registration.html' }, { text: 'Sponsors & Exhibitors' }]}
-        intro="Sponsorship categories for organisations that wish to exhibit and participate at ICCMM-26."
+      <PageHeader eyebrow={pageText.sponsors.eyebrow} title={pageText.sponsors.title} accent={pageText.sponsors.accent} crumbs={[{ text: 'Registration', url: 'registration.html' }, { text: 'Sponsors & Exhibitors' }]}
+        intro={fillText(pageText.sponsors.intro)}
         subnav={[{ id: 'tiers', text: 'Categories' }, { id: 'compare', text: 'Compare' }, { id: 'supporters', text: 'Supporting organisations' }]} />
 
       <section className="section" id="tiers" aria-labelledby="tiers-title">

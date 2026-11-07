@@ -9,7 +9,7 @@ export function Portrait({ id, sizes = '(max-width: 760px) 80vw, 360px', eager =
   if (!g) return null;
   if (!p) {
     return (
-      <span className={`portrait portrait--empty ${className}`} role="img" aria-label={`Portrait of ${displayName(g)} to follow`}>
+      <span className={`portrait portrait--empty ${className}`} role="img" aria-label={g.placeholder ? 'Guest to be announced' : `Portrait of ${displayName(g)} to follow`}>
         <svg className="portrait-circuit" viewBox="0 0 200 250" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
           <path d="M100 0v62M100 188v62M0 125h46M154 125h46M30 0v40h40v30M170 250v-40h-40v-30M0 200h30l20-20M200 50h-30l-20 20" />
           <rect x="62" y="87" width="76" height="76" rx="10" />

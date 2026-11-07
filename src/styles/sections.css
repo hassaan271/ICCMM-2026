@@ -203,7 +203,7 @@
 .info-cur { font-size: 0.55em; font-weight: 500; margin-right: 3px; vertical-align: 0.4em; }
 .info-plus { font-size: 0.36em; font-weight: 500; margin-left: 8px; letter-spacing: 0; opacity: 0.8; }
 .info-sub { font-size: 0.82rem; color: rgba(255,255,255,.75); }
-.info-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 14px; }
+.info-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 0; }
 .icard { position: relative; display: grid; gap: 6px; padding: 26px; border-radius: var(--radius-l); background: var(--white); border: 1px solid var(--line); transition: transform 0.5s var(--ease-out), box-shadow 0.5s, border-color 0.4s; }
 .icard:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: rgba(10,111,165,.3); }
 .icard .label { color: var(--blue); }

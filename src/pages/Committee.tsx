@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { committee, committeeGuestIds, organizingCommittee, portraits } from '../data/conference';
+import { committee, committeeGuestIds, organizingCommittee, portraits, pageText, fillText } from '../data/conference';
 import { portraitOf } from '../data/guests/image-sources';
 import { Eyebrow, Heading } from '../components/shared/Typography';
 import { PageHeader } from '../components/shared/PageHeader';
@@ -37,8 +37,8 @@ export function Committee() {
 
   return (
     <>
-      <PageHeader eyebrow="Committee" title="Conference" accent="committee." crumbs={[{ text: 'Committee' }]}
-        intro="Patrons, chairs and committees of ICCMM-26, drawn from MJCET, the IEEE Hyderabad Section and institutions in India and abroad."
+      <PageHeader eyebrow={pageText.committee.eyebrow} title={pageText.committee.title} accent={pageText.committee.accent} crumbs={[{ text: 'Committee' }]}
+        intro={fillText(pageText.committee.intro)}
         subnav={[{ id: 'conference-committee', text: 'Conference committee' }, { id: 'organizing-committee', text: 'Organizing committee' }]} />
 
       <section className="section" id="conference-committee" aria-labelledby="cc-title">
