@@ -16,18 +16,19 @@ The schedule lists these three, but Guest Info marks them **NO**. They're left o
 
 | Item | What the documents say | What the site shows |
 |---|---|---|
-| Dr. Merugu Laxmi vs Dr. Merugu Lakshminarayana | Both are listed as "Conference Committee Chair, IEEE Hyderabad Section", with different photos and bios (one "she", one "he"). The schedule names Lakshminarayana. | Lakshminarayana only. "Merugu Laxmi" is held back. |
+| Dr. Merugu Laxmi vs Dr. Merugu Lakshminarayana | The updated Guest Info.pdf (Nov 2026) lists only Dr. Merugu Lakshminarayana. | Resolved: Lakshminarayana only. |
 | M. G. P. L. Narayana | "Dr." in the IEEE table and schedule, "Mr." in the Inaugural table. Listed twice in Guest Info. | One consolidated profile, shown without an honorific. |
 | Dr. Moiz M. | Name looks incomplete. The schedule's Session 6 chair is "Dr Salman Abdul Moiz, UoH". | "Dr. Moiz M." on the Guests page, the schedule name on Event Flow, and the two are linked as the same person. Please confirm. |
-| Dr. Vijay Latha | The schedule says "Dr. Vijayalata Reddy (VCE)". | Each document's spelling where it's used. Please confirm. |
+| Dr. Y. Vijayalatha Reddy | Spelling confirmed by the organisers in Stage 8. | "Dr. Y. Vijayalatha Reddy" everywhere. |
 | Dr. K. Jaya Sankar | The schedule says "K. Jaya Shankar". | Each document's spelling where it's used. |
 | Dr. Thirmal | The bio says "Dr. Thurman" (typo). | Corrected to "Dr. C. Thirmal". |
-| Dr. Sridevi | Single name only. | As supplied. |
+| Dr. R. Sridevi | Full name confirmed by the organisers in Stage 8. | "Dr. R. Sridevi" everywhere. |
 | Mr. Syed Omer Javeed | Guest Info: designation to be confirmed. Schedule: "Treasurer, SUES". | "Designation to be confirmed". |
-| Dr. C. Thirmal, Dr. Moiz M., Dr. Sridevi, Dr. Sanju Tiwari, Dr. M. A. Jabbar, Dr. Vijay Latha, Dr. K. Jaya Sankar, Dr. Jyoti Singhai | Designation "to be confirmed" (some bios do say "Professor"). | "Designation to be confirmed"; bios as supplied. |
+| Dr. C. Thirmal, Dr. Moiz M., Dr. R. Sridevi, Dr. Sanju Tiwari, Dr. M. A. Jabbar, Dr. Y. Vijayalatha Reddy, Dr. K. Jaya Sankar, Dr. Jyoti Singhai | Designation "to be confirmed" (some bios do say "Professor"). | "Designation to be confirmed"; bios as supplied. |
 | Dr. Krishna Kanth Avalur | Table: "MOSart Semiconductors". Bio: "MOSart Labs". | As supplied. |
 | Dr. Arshad Mohammed (Poster Presentation) | Affiliation printed as "SUKHU" / "SUKHHU". | "Affiliation to be confirmed". |
-| Dr. Abhishek Ranjan, Prof. Krishna Reddy P. | In the schedule only. No bio or photo. | Name and designation from the schedule, with a placeholder portrait and "Biography to be announced". |
+| Prof. P. Krishna Reddy | Bio and designation supplied in the updated Guest Info.pdf (Nov 2026). | Published as supplied; bio opens with "Dr.", heading says "Prof." (shown as Prof.). |
+| Dr. Abhishek Ranjan | Removed as Chief Guest of the inaugural session (Stage 8, organiser instruction). | Not shown anywhere on the site. No replacement named. |
 
 ## Bio edits
 

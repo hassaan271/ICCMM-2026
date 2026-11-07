@@ -6,14 +6,12 @@ import { Eyebrow, Heading, pad } from '../components/shared/Typography';
 import { PageHeader } from '../components/shared/PageHeader';
 import { LiquidButton } from '../components/buttons/LiquidButton';
 import { Portrait } from '../components/guests/Portrait';
-import { GuestDialog } from '../components/guests/GuestDialog';
 import { rolesOf } from '../components/guests/guest-roles';
-import { useProfileDialog } from '../components/guests/useProfileDialog';
 
 const Designation = ({ g }: { g: Guest }) => (g.designation ? <>{g.designation}</> : <span className="is-pending">Designation to be confirmed</span>);
 
 /* Keynote speakers: large editorial spreads, portrait clipped in on scroll */
-function Keynote({ g, i, open }: { g: Guest; i: number; open: (id: string) => void }) {
+function Keynote({ g, i }: { g: Guest; i: number }) {
   const slot = rolesOf(g).find((r) => r.label === 'Keynote Speaker');
   // Other programme roles (e.g. inaugural guest), shown so a second role is clear rather than duplicated on the Guests page
   const also = rolesOf(g).filter((r) => r.label !== 'Keynote Speaker' && r.label !== 'Poster Presentation');
@@ -29,17 +27,13 @@ function Keynote({ g, i, open }: { g: Guest; i: number; open: (id: string) => vo
         <p className="kn-role" data-reveal=""><Designation g={g} /><span>{g.organization}</span></p>
         {g.bio ? <p className="kn-bio" data-reveal="">{g.bio}</p> : <p className="kn-bio is-pending" data-reveal="">Biography and keynote title to be announced.</p>}
         {also.length > 0 && <p className="kn-also" data-reveal="">Also {also.map((r) => `${r.label} · ${r.itemTitle}`).join('; ')}.</p>}
-        <div className="actions" data-reveal="">
-          <button type="button" className="more-btn" onClick={() => open(g.id)}>Full profile</button>
-          {slot && <a className="link-arrow" href={href('programme', slot.item)}>{slot.itemTitle} in the programme →</a>}
-        </div>
+        {slot && <div className="actions" data-reveal=""><a className="link-arrow" href={href('programme', slot.item)}>{slot.itemTitle} in the programme →</a></div>}
       </div>
     </article>
   );
 }
 
 export function Speakers() {
-  const { openId, open, close } = useProfileDialog();
   const root = useRef<HTMLDivElement>(null);
 
   // Subtle parallax inside the keynote portraits
@@ -64,9 +58,8 @@ export function Speakers() {
         <div className="wrap">
           <div className="section-head">
             <div><Eyebrow>Keynote speakers</Eyebrow><Heading text="Keynote" accent="addresses." id="kn-title" /></div>
-            <p className="section-intro" data-reveal="">{keynotes.map((g) => { const d = rolesOf(g).find((r) => r.label === 'Keynote Speaker')?.day; return d ? `${displayName(g)} opens ${d.label}, ${d.date}` : displayName(g); }).join('; ')}.</p>
           </div>
-          <div className="kn-list">{keynotes.map((g, i) => <Keynote key={g.id} g={g} i={i} open={open} />)}</div>
+          <div className="kn-list">{keynotes.map((g, i) => <Keynote key={g.id} g={g} i={i} />)}</div>
           <div className="actions mt" data-reveal="">
             <LiquidButton href={href('guests')}>Meet the guests</LiquidButton>
             <LiquidButton href={href('programme')} variant="glass">See the event flow</LiquidButton>
@@ -74,7 +67,6 @@ export function Speakers() {
         </div>
       </section>
 
-      <GuestDialog id={openId} onClose={close} />
     </div>
   );
 }

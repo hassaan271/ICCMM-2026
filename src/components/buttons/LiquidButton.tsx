@@ -1,7 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { gsap, finePointer } from '../../animations/motion';
 import { links } from '../../data/conference';
-import { href } from '../../utils/routes';
 import { LiquidGlass } from '../glass/LiquidGlass';
 import { ArrowIcon } from '../shared/Icons';
 
@@ -50,8 +49,6 @@ export function LiquidButton({ href: url, children, variant = 'primary', size = 
   );
 }
 
-// Registration CTA: the live form once links.registrationForm is configured, otherwise the registration page
+// Registration CTA: opens the official Google Form in a new tab
 export const RegisterButton = ({ variant = 'primary', size = '', children = 'Register Now' }: { variant?: ButtonVariant; size?: BtnProps['size']; children?: ReactNode }) =>
-  links.registrationForm
-    ? <LiquidButton href={links.registrationForm} variant={variant} size={size} external>{children}</LiquidButton>
-    : <LiquidButton href={href('registration', 'register')} variant={variant} size={size}>{children}</LiquidButton>;
+  <LiquidButton href={links.registrationForm} variant={variant} size={size} external>{children}</LiquidButton>;

@@ -19,7 +19,7 @@ export function onBootDone(cb: () => void) {
   window.addEventListener('iccmm:boot-done', cb, { once: true });
   return () => window.removeEventListener('iccmm:boot-done', cb);
 }
-export const signalBoot = (step: 'app' | 'scene') => window.dispatchEvent(new Event(`iccmm:${step}`));
+export const signalBoot = (step: 'app') => window.dispatchEvent(new Event(`iccmm:${step}`));
 
 /* ───────── Smooth scrolling ───────── */
 let lenis: Lenis | null = null;

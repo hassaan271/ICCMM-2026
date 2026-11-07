@@ -4,7 +4,7 @@ import { Environment, Lightformer } from '@react-three/drei';
 import { ACESFilmicToneMapping, AdditiveBlending, BufferGeometry, Color, Float32BufferAttribute, PCFSoftShadowMap, Points, type DirectionalLight, type PerspectiveCamera } from 'three';
 import { Processor } from './Processor';
 import { story, poseAt } from '../../animations/story';
-import { pointer, signalBoot } from '../../animations/motion';
+import { pointer } from '../../animations/motion';
 
 /* Camera follows the scroll pose; the cursor adds a limited orbit on top */
 function CameraRig() {
@@ -88,7 +88,7 @@ export default function ProcessorScene({ active, onFail }: { active: boolean; on
   const mobile = story.mobile;
   // The canvas fades in once the model is fully prepared, so it never pops in half-built
   const [ready, setReady] = useState(false);
-  const onReady = useCallback(() => { setReady(true); signalBoot('scene'); }, []);
+  const onReady = useCallback(() => setReady(true), []);
   return (
     <Canvas
       className={`stage-canvas${ready ? ' is-ready' : ''}`}

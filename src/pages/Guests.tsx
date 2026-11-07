@@ -1,24 +1,49 @@
 import { useEffect, useRef, useState } from 'react';
-import { guests, guestCategories, keynoteIds, guestById, displayName, type Guest } from '../data/guests';
+import { guests, displayName, type Guest, type GuestRole } from '../data/guests';
 import { portraitOf } from '../data/guests/image-sources';
 import { href } from '../utils/routes';
 import { gsap, finePointer, prefersReduced } from '../animations/motion';
-import { Eyebrow, Heading } from '../components/shared/Typography';
+import { Eyebrow, Heading, pad } from '../components/shared/Typography';
 import { PageHeader } from '../components/shared/PageHeader';
 import { GlassPanel } from '../components/glass/GlassPanel';
 import { LiquidButton } from '../components/buttons/LiquidButton';
 import { Portrait } from '../components/guests/Portrait';
 import { GuestDialog } from '../components/guests/GuestDialog';
-import { rolesOf, leadRole, profileHref } from '../components/guests/guest-roles';
+import { rolesOf } from '../components/guests/guest-roles';
 import { useProfileDialog } from '../components/guests/useProfileDialog';
 
-// Keynote speakers have their own page; their inaugural roles are noted there and linked from here
-const cat = (id: Guest['category']) => guestCategories.find((c) => c.id === id)!;
-const inCat = (id: Guest['category']) => guests.filter((g) => g.category === id && !keynoteIds.includes(g.id));
 const Designation = ({ g }: { g: Guest }) => (g.designation ? <>{g.designation}</> : <span className="is-pending">Designation to be confirmed</span>);
 
-/* Inaugural session: horizontal gallery of portrait cards */
-function Gallery({ list, open }: { list: Guest[]; open: (id: string) => void }) {
+type Resolved = ReturnType<typeof rolesOf>[number];
+type Entry = { g: Guest; role: Resolved };
+
+// Guests and speakers are listed in programme order: inaugural, keynotes, session chairs, panel, valedictory.
+// Someone with several roles appears in each session they take part in.
+const sessions: { id: string; eyebrow: string; title: string; accent: string; intro: string; match: (r: GuestRole) => boolean; view: 'gallery' | 'grid' | 'list' }[] = [
+  { id: 'inaugural', eyebrow: 'Inaugural session', title: 'Inaugural', accent: 'session.', view: 'gallery', match: (r) => r.item === 'd1-inaugural',
+    intro: 'Guests of honour, special guest and distinguished guests of the inaugural session on 20 November 2026.' },
+  { id: 'keynote', eyebrow: 'Keynote sessions', title: 'Keynote', accent: 'speakers.', view: 'gallery', match: (r) => r.label === 'Keynote Speaker',
+    intro: 'One keynote address opens each day of the conference.' },
+  { id: 'session-chairs', eyebrow: 'Technical sessions', title: 'Session', accent: 'chairs.', view: 'grid', match: (r) => r.label.startsWith('Session Chair'),
+    intro: 'Academic representatives and IEEE Hyderabad Section members chairing the technical sessions, in session order.' },
+  { id: 'panel', eyebrow: 'Panel discussion', title: 'Panel', accent: 'discussion.', view: 'list', match: (r) => r.item === 'd2-panel',
+    intro: 'Panellists of the panel discussion on 21 November 2026.' },
+  { id: 'valedictory', eyebrow: 'Valedictory', title: 'Valedictory', accent: 'session.', view: 'gallery', match: (r) => r.item === 'd2-valedictory',
+    intro: 'Guests of the valedictory session closing the conference on 21 November 2026.' },
+];
+
+const sessionNo = (label: string) => Number(/Session (\d+)/.exec(label)?.[1] ?? 99);
+
+const entriesFor = (match: (r: GuestRole) => boolean, sortBySession: boolean): Entry[] => {
+  const list = guests.flatMap((g) => {
+    const role = rolesOf(g).find((r) => match(r));
+    return role ? [{ g, role }] : [];
+  });
+  return sortBySession ? list.sort((a, b) => sessionNo(a.role.label) - sessionNo(b.role.label)) : list;
+};
+
+/* Horizontal gallery of portrait cards */
+function Gallery({ list, open, label, anchor }: { list: Entry[]; open: (id: string) => void; label: string; anchor: (id: string) => string | undefined }) {
   const rail = useRef<HTMLUListElement>(null);
   const [edge, setEdge] = useState({ start: true, end: false });
   useEffect(() => {
@@ -36,12 +61,12 @@ function Gallery({ list, open }: { list: Guest[]; open: (id: string) => void }) 
   };
   return (
     <div className="gal">
-      <ul className="gal-rail" ref={rail} aria-label="Inaugural session guests">
-        {list.map((g, i) => (
-          <li key={g.id} id={`guest-${g.id}`} className="gal-item" data-reveal="" style={{ ['--d' as string]: `${Math.min(i, 6) * 70}ms` }}>
-            <button type="button" className="gcard" onClick={() => open(g.id)} aria-label={`${displayName(g)}, ${leadRole(g)}. Open profile`}>
+      <ul className="gal-rail" ref={rail} aria-label={label}>
+        {list.map(({ g, role }, i) => (
+          <li key={g.id} id={anchor(g.id)} className="gal-item" data-reveal="" style={{ ['--d' as string]: `${Math.min(i, 6) * 70}ms` }}>
+            <button type="button" className="gcard" onClick={() => open(g.id)} aria-label={`${displayName(g)}, ${role.label}. Open profile`}>
               <span className="gcard-photo"><Portrait id={g.id} sizes="(max-width: 760px) 70vw, 300px" /></span>
-              <span className="gcard-badge">{leadRole(g)}</span>
+              <span className="gcard-badge">{role.label.split(' · ')[0]}</span>
               <span className="gcard-name">{displayName(g)}</span>
               <span className="gcard-role"><Designation g={g} /></span>
             </button>
@@ -56,8 +81,8 @@ function Gallery({ list, open }: { list: Guest[]; open: (id: string) => void }) 
   );
 }
 
-/* IEEE Hyderabad Section: editorial name list; a portrait follows the cursor on hover, rows expand for the bio */
-function EditorialList({ list }: { list: Guest[] }) {
+/* Editorial name list; a portrait follows the cursor on hover, rows expand for the bio */
+function EditorialList({ list, anchor }: { list: Entry[]; anchor: (id: string) => string | undefined }) {
   const [openId, setOpenId] = useState<string | null>(null);
   const [hover, setHover] = useState<string | null>(null);
   const wrap = useRef<HTMLDivElement>(null);
@@ -75,14 +100,14 @@ function EditorialList({ list }: { list: Guest[] }) {
   return (
     <div className="ed" ref={wrap} onPointerLeave={() => setHover(null)}>
       <div className={`ed-float${hp ? ' is-on' : ''}`} ref={float} aria-hidden="true">
-        {list.map((g) => <span key={g.id} className={hover === g.id ? 'is-cur' : ''}><Portrait id={g.id} sizes="220px" /></span>)}
+        {list.map(({ g }) => <span key={g.id} className={hover === g.id ? 'is-cur' : ''}><Portrait id={g.id} sizes="220px" /></span>)}
       </div>
       <ol className="ed-list">
-        {list.map((g) => {
+        {list.map(({ g }) => {
           const open = openId === g.id;
           const roles = rolesOf(g);
           return (
-            <li key={g.id} id={`guest-${g.id}`} className={`ed-row${open ? ' is-open' : ''}`} onPointerEnter={() => setHover(g.id)}>
+            <li key={g.id} id={anchor(g.id)} className={`ed-row${open ? ' is-open' : ''}`} onPointerEnter={() => setHover(g.id)}>
               <div data-reveal="">
               <h3 className="ed-h">
                 <button type="button" className="ed-btn" aria-expanded={open} aria-controls={`ed-${g.id}`} onClick={() => setOpenId(open ? null : g.id)}>
@@ -113,25 +138,22 @@ function EditorialList({ list }: { list: Guest[] }) {
   );
 }
 
-/* Academic representatives: portrait grid; hover (or focus) lifts a glass panel with the session role */
-function Grid({ list, open }: { list: Guest[]; open: (id: string) => void }) {
+/* Portrait grid; hover (or focus) lifts a glass panel with the session role */
+function Grid({ list, open, anchor }: { list: Entry[]; open: (id: string) => void; anchor: (id: string) => string | undefined }) {
   return (
     <ul className="ggrid">
-      {list.map((g) => {
-        const r = rolesOf(g)[0];
-        return (
-          <li key={g.id} id={`guest-${g.id}`} data-reveal="">
-            <button type="button" className="gtile" onClick={() => open(g.id)} aria-label={`${displayName(g)}. Open profile`}>
-              <span className="gtile-photo"><Portrait id={g.id} sizes="(max-width: 560px) 90vw, (max-width: 1000px) 45vw, 400px" /></span>
-              <GlassPanel kind="frost" as="span" className="gtile-info" refraction={12} blur={6}>
-                <span className="gtile-name">{displayName(g)}</span>
-                <span className="gtile-org">{g.organization}</span>
-                {r && <span className="gtile-x"><span><span className="gtile-r">{r.label} · {r.when}</span></span></span>}
-              </GlassPanel>
-            </button>
-          </li>
-        );
-      })}
+      {list.map(({ g, role }) => (
+        <li key={g.id} id={anchor(g.id)} data-reveal="">
+          <button type="button" className="gtile" onClick={() => open(g.id)} aria-label={`${displayName(g)}, ${role.label}. Open profile`}>
+            <span className="gtile-photo"><Portrait id={g.id} sizes="(max-width: 560px) 90vw, (max-width: 1000px) 45vw, 400px" /></span>
+            <GlassPanel kind="frost" as="span" className="gtile-info" refraction={12} blur={6}>
+              <span className="gtile-name">{displayName(g)}</span>
+              <span className="gtile-org">{g.organization}</span>
+              <span className="gtile-x"><span><span className="gtile-r">{role.label} · {role.when}</span></span></span>
+            </GlassPanel>
+          </button>
+        </li>
+      ))}
     </ul>
   );
 }
@@ -139,57 +161,32 @@ function Grid({ list, open }: { list: Guest[]; open: (id: string) => void }) {
 export function Guests() {
   const { openId, open, close } = useProfileDialog();
 
-  const inaugural = inCat('inaugural');
-  const ieee = inCat('ieee');
-  const academic = inCat('academic');
-  const total = guests.length - keynoteIds.length;
-  // Keynote speakers who also hold an inaugural-session role
-  const alsoInaugural = keynoteIds.map((id) => guestById(id)!).map((g) => ({ g, r: rolesOf(g).find((x) => x.item === 'd1-inaugural') })).filter((x) => x.r);
+  const blocks = sessions.map((s) => ({ ...s, list: entriesFor(s.match, s.id === 'session-chairs') })).filter((s) => s.list.length > 0);
+  // Profile links point at #guest-<id>; only the first appearance carries the anchor
+  const seen = new Set<string>();
+  const anchor = (id: string) => (seen.has(id) ? undefined : (seen.add(id), `guest-${id}`));
 
   return (
     <div>
-      <PageHeader eyebrow="Guests" title="Distinguished" accent="guests." crumbs={[{ text: 'Guests' }]}
-        intro={`Guests of the inaugural and valedictory sessions, IEEE Hyderabad Section dignitaries and the academic representatives chairing the technical sessions: ${total} confirmed guests across both days. The keynote speakers are listed on the Speakers page.`}
-        subnav={[{ id: 'inaugural', text: 'Inaugural session' }, { id: 'ieee', text: 'IEEE Hyderabad Section' }, { id: 'academic', text: 'Academic representatives' }]} />
+      <PageHeader eyebrow="Guests & speakers" title="Distinguished" accent="guests." crumbs={[{ text: 'Guests' }]}
+        intro={`Guests and speakers of ICCMM-26 in programme order: inaugural session, keynote sessions, session chairs, panel discussion and valedictory. ${guests.length} confirmed guests across both days.`}
+        subnav={blocks.map((s) => ({ id: s.id, text: s.eyebrow }))} />
 
-      <section className="section section--tint" id="inaugural" aria-labelledby="ina-title">
-        <div className="wrap">
-          <div className="section-head">
-            <div><Eyebrow>{cat('inaugural').title} session</Eyebrow><Heading text="Guests of the" accent="inaugural session." id="ina-title" /></div>
-            <p className="section-intro" data-reveal="">{cat('inaugural').intro}</p>
+      {blocks.map((s, i) => (
+        <section className={`section${i % 2 === 0 ? ' section--tint' : ''}`} id={s.id} aria-labelledby={`${s.id}-title`} key={s.id}>
+          <div className="wrap">
+            <div className="section-head">
+              <div><Eyebrow>{pad(i + 1)} · {s.eyebrow}</Eyebrow><Heading text={s.title} accent={s.accent} id={`${s.id}-title`} /></div>
+              <p className="section-intro" data-reveal="">{s.intro}</p>
+            </div>
+            {s.view === 'gallery' && <Gallery list={s.list} open={open} label={`${s.eyebrow}: guests`} anchor={anchor} />}
+            {s.view === 'grid' && <Grid list={s.list} open={open} anchor={anchor} />}
+            {s.view === 'list' && <EditorialList list={s.list} anchor={anchor} />}
+            {s.id === 'keynote' && <div className="actions mt" data-reveal=""><LiquidButton href={href('speakers')} variant="glass">Keynote speakers page</LiquidButton></div>}
+            {i === blocks.length - 1 && <div className="actions mt" data-reveal=""><LiquidButton href={href('programme')}>See the event flow</LiquidButton></div>}
           </div>
-          <Gallery list={inaugural} open={open} />
-          {alsoInaugural.length > 0 && (
-            <p className="also-note" data-reveal="">
-              Also joining the inaugural session, from the Speakers page:{' '}
-              {alsoInaugural.map(({ g, r }, i) => (
-                <span key={g.id}>{i > 0 && ' and '}<a href={profileHref(g.id)}>{displayName(g)}</a> ({r!.label})</span>
-              ))}.
-            </p>
-          )}
-        </div>
-      </section>
-
-      <section className="section" id="ieee" aria-labelledby="ieee-title">
-        <div className="wrap">
-          <div className="section-head">
-            <div><Eyebrow>IEEE Hyderabad Section</Eyebrow><Heading text={cat('ieee').title} accent={cat('ieee').accent} id="ieee-title" /></div>
-            <p className="section-intro" data-reveal="">{cat('ieee').intro} The Section Chair and Conference Committee Chair are listed with the inaugural session.</p>
-          </div>
-          <EditorialList list={ieee} />
-        </div>
-      </section>
-
-      <section className="section section--tint" id="academic" aria-labelledby="ac-title">
-        <div className="wrap">
-          <div className="section-head">
-            <div><Eyebrow>Session chairs</Eyebrow><Heading text={cat('academic').title} accent={cat('academic').accent} id="ac-title" /></div>
-            <p className="section-intro" data-reveal="">{cat('academic').intro}</p>
-          </div>
-          <Grid list={academic} open={open} />
-          <div className="actions mt" data-reveal=""><LiquidButton href={href('programme')}>See the event flow</LiquidButton></div>
-        </div>
-      </section>
+        </section>
+      ))}
 
       <GuestDialog id={openId} onClose={close} />
     </div>

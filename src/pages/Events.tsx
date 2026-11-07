@@ -10,8 +10,7 @@ import { PageHeader } from '../components/shared/PageHeader';
 import { Timeline, Caveat } from '../components/shared/Timeline';
 
 const posters = [
-  { src: 'assets/images/call-for-posters', caption: 'Call for Posters', alt: 'ICCMM-26 Call for Posters: Sustainable and Intelligent Technologies for Transformative Solutions, with poster tracks, submission guidelines, important dates, who should submit, and contact details' },
-  { src: 'assets/images/technical-competitions', caption: 'Technical Competitions: Thesis & Poster', alt: 'Technical Competitions in ICCMM-26 poster, covering thesis and poster categories, submission deadline, registration fee and venue' },
+  { src: 'assets/images/call-for-posters', caption: 'Call for Posters', alt: 'ICCMM-26 Call for Posters, 20–21 November 2026: Sustainable and Intelligent Technologies for Transformative Solutions. Poster tracks, submission guidelines (250–300 word abstract to iccmm@mjcollege.ac.in), poster presentation, who should submit, and important dates: abstract deadline 10 November 2026, acceptance 12 November, registration 13 November, presentation 21 November 2026. Venue: MJCET, Banjara Hills, Hyderabad.' },
 ];
 
 function Lightbox({ item, onClose }: { item: (typeof posters)[number]; onClose: () => void }) {
@@ -40,7 +39,7 @@ export function Events() {
     <>
       <PageHeader eyebrow="Technical event" title="Special" accent="poster session." intro={posterSession.intro}
         crumbs={[{ text: 'Call for Papers', url: href('cfp') }, { text: 'Technical Events' }]}
-        subnav={[{ id: 'theme', text: 'Theme & tracks' }, { id: 'guidelines', text: 'Guidelines' }, { id: 'posters-official', text: 'Official posters' }, { id: 'poster-dates', text: 'Published dates' }]} />
+        subnav={[{ id: 'theme', text: 'Theme & tracks' }, { id: 'guidelines', text: 'Guidelines' }, { id: 'posters-official', text: 'Official poster' }, { id: 'poster-dates', text: 'Published dates' }]} />
 
       <section className="section" id="theme" aria-labelledby="theme-title">
         <div className="wrap">
@@ -85,9 +84,9 @@ export function Events() {
 
       <section className="section" id="posters-official" aria-labelledby="op-title">
         <div className="wrap">
-          <Eyebrow>Official posters</Eyebrow>
-          <Heading text="Event" accent="posters." id="op-title" />
-          <p className="section-intro" data-reveal="">Official ICCMM-26 event posters, reproduced as issued. Select a poster to view it full size.</p>
+          <Eyebrow>Official poster</Eyebrow>
+          <Heading text="Call for" accent="posters." id="op-title" />
+          <p className="section-intro" data-reveal="">The official ICCMM-26 Call for Posters, reproduced as issued. Select the poster to view it full size.</p>
           <div className="poster-row">
             {posters.map((p, i) => (
               <figure className="poster-fig" key={p.src} data-reveal="">

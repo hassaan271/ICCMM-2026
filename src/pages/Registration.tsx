@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { fees, links, meta, eventFee } from '../data/conference';
+import { useEffect, useRef, useState } from 'react';
+import { fees, links, eventFee } from '../data/conference';
 import { Eyebrow, Heading } from '../components/shared/Typography';
 import { GlassPanel } from '../components/glass/GlassPanel';
 import { Segmented } from '../components/shared/Controls';
 import { ArrowIcon } from '../components/shared/Icons';
 import { PageHeader } from '../components/shared/PageHeader';
+import { LiquidButton } from '../components/buttons/LiquidButton';
 import { gsap } from '../animations/motion';
 
 const inr = (n: number) => n.toLocaleString('en-IN');
@@ -133,82 +134,31 @@ export function Registration() {
             <Heading text="Register" accent="for ICCMM-26." id="register-title" />
             <a className="link-row" href={links.cmt} target="_blank" rel="noopener noreferrer" data-reveal="">Paper submission: Microsoft CMT <ArrowIcon external /></a>
           </div>
-          <RegisterForm />
+          <RegisterGateway />
         </div>
       </section>
     </>
   );
 }
 
-// Indian mobile number: 10 digits starting 6–9, optionally written with +91 / 0 and spaces or dashes
-const normaliseMobile = (v: string) => v.replace(/[\s-]/g, '').replace(/^(\+91|0091|91(?=\d{10}$)|0(?=\d{10}$))/, '');
-const validate = (name: string, mobile: string) => ({
-  name: !name.trim() ? 'Please enter your full name.' : name.trim().length < 3 ? 'Please enter your full name as it should appear on the certificate.' : !/^[\p{L} .'-]+$/u.test(name.trim()) ? 'Names can contain letters, spaces, full stops, hyphens and apostrophes only.' : '',
-  mobile: !mobile.trim() ? 'Please enter your mobile number.' : !/^[6-9]\d{9}$/.test(normaliseMobile(mobile)) ? 'Enter a valid 10-digit Indian mobile number, e.g. 98765 43210.' : '',
-});
-
-/* Registration details. Nothing is stored or sent by this site: once the Google Form is configured
-   (links.registrationForm), a valid entry opens it in a new tab, pre-filled when the field ids are set. */
-function RegisterForm() {
-  const [name, setName] = useState('');
-  const [mobile, setMobile] = useState('');
-  const [touched, setTouched] = useState({ name: false, mobile: false });
-  const [status, setStatus] = useState<'' | 'opened' | 'pending'>('');
-  const errors = validate(name, mobile);
-  const formUrl = links.registrationForm;
-
-  const submit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setTouched({ name: true, mobile: true });
-    if (errors.name || errors.mobile) {
-      (e.currentTarget.querySelector(errors.name ? '#reg-name' : '#reg-mobile') as HTMLInputElement | null)?.focus();
-      return;
-    }
-    if (!formUrl) { setStatus('pending'); return; }
-    const url = new URL(formUrl);
-    const ids = links.registrationFormFields;
-    if (ids.name) url.searchParams.set(ids.name, name.trim());
-    if (ids.mobile) url.searchParams.set(ids.mobile, normaliseMobile(mobile));
-    if (ids.name || ids.mobile) url.searchParams.set('usp', 'pp_url');
-    window.open(url.toString(), '_blank', 'noopener,noreferrer');
-    setStatus('opened');
-  };
-
-  const field = (id: 'name' | 'mobile') => ({
-    'aria-invalid': touched[id] && !!errors[id],
-    'aria-describedby': touched[id] && errors[id] ? `reg-${id}-err` : undefined,
-    onBlur: () => setTouched((t) => ({ ...t, [id]: true })),
-  });
-
+/* Registration gateway: registration itself happens on the official Google Form (links.registrationForm),
+   which opens in a new tab. No visitor details are collected on this website. */
+function RegisterGateway() {
   return (
-    <GlassPanel kind="light" className="reg-form-card" data-reveal="">
-      <form className="reg-form" onSubmit={submit} noValidate aria-labelledby="reg-form-title">
-        <p className="label" id="reg-form-title">Conference registration</p>
-        <div className={`field${touched.name && errors.name ? ' is-invalid' : ''}`}>
-          <label htmlFor="reg-name">Full Name</label>
-          <input id="reg-name" name="name" type="text" autoComplete="name" value={name} placeholder="Name as on your certificate"
-            onChange={(e) => { setName(e.target.value); setStatus(''); }} {...field('name')} />
-          {touched.name && errors.name && <p className="field-err" id="reg-name-err">{errors.name}</p>}
-        </div>
-        <div className={`field${touched.mobile && errors.mobile ? ' is-invalid' : ''}`}>
-          <label htmlFor="reg-mobile">Mobile Number</label>
-          <div className="field-tel">
-            <span className="field-prefix" aria-hidden="true">+91</span>
-            <input id="reg-mobile" name="mobile" type="tel" inputMode="tel" autoComplete="tel-national" value={mobile} placeholder="98765 43210" maxLength={16}
-              onChange={(e) => { setMobile(e.target.value.replace(/[^\d+\s-]/g, '')); setStatus(''); }} {...field('mobile')} />
-          </div>
-          {touched.mobile && errors.mobile && <p className="field-err" id="reg-mobile-err">{errors.mobile}</p>}
-        </div>
-        <button type="submit" className="lbtn lbtn--primary reg-submit">
-          <span className="lq" aria-hidden="true"><span className="lq-base" /><span className="lq-blob" /></span>
-          <span className="lbtn-label">Register Now</span><ArrowIcon external={!!formUrl} />
-        </button>
-        <p className="reg-form-note" aria-live="polite">
-          {status === 'opened' && 'The registration form has opened in a new tab. Complete and submit it there.'}
-          {status === 'pending' && <>The online registration form link has not been published yet. Please <a href={`mailto:${meta.email}?subject=${encodeURIComponent('ICCMM-26 Registration')}`}>email the organisers</a> to register.</>}
-          {!status && (formUrl ? 'Registration is completed on the official Google Form, which opens in a new tab.' : 'Your details are not stored by this website. Registration is completed on the official Google Form once its link is published.')}
-        </p>
-      </form>
+    <GlassPanel kind="light" className="reg-gate" data-reveal="">
+      <p className="label">Conference registration</p>
+      <p className="reg-gate-t">Register on the official ICCMM-26 registration form.</p>
+      <p className="reg-gate-d">Delegates, authors, attendees and poster teams register through the official Google Form. Note your category and fee from the tables above before you begin.</p>
+      <ul className="reg-gate-fees" aria-label="Technical event registration fees">
+        {fees.other.map((r) => {
+          const f = eventFee(r);
+          return <li key={r.label}><span className="reg-gate-cat">{r.label}</span><span className="reg-gate-amt"><strong>{f.price}</strong> {f.unit}{r.note && <span> · {r.note}</span>}</span></li>;
+        })}
+      </ul>
+      <div className="reg-gate-cta">
+        <LiquidButton href={links.registrationForm} external className="reg-gate-btn">Register Now</LiquidButton>
+        <p className="reg-gate-note">Opens the official Google Form in a new tab.</p>
+      </div>
     </GlassPanel>
   );
 }

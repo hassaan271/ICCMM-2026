@@ -1,7 +1,7 @@
 import { Component, lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { meta, about, aboutShort, tracks, supporters } from '../../data/conference';
 import { href } from '../../utils/routes';
-import { gsap, ScrollTrigger, prefersReduced, isMobile, onBootDone, signalBoot } from '../../animations/motion';
+import { gsap, ScrollTrigger, prefersReduced, isMobile, onBootDone } from '../../animations/motion';
 import { story, keys, poseAt } from '../../animations/story';
 import { Eyebrow, Words } from '../shared/Typography';
 import { LiquidButton, RegisterButton } from '../buttons/LiquidButton';
@@ -88,7 +88,7 @@ export function ArchitectureStory() {
   const [ready, setReady] = useState(false);
   const [sceneFailed, setSceneFailed] = useState(false);
   // Release the loading screen straight away rather than waiting for a scene that won't arrive
-  const onSceneFail = useCallback(() => { setSceneFailed(true); signalBoot('scene'); }, []);
+  const onSceneFail = useCallback(() => setSceneFailed(true), []);
 
   // Starting the 3D scene (evaluating its chunk, creating the WebGL context) is heavy main-thread work.
   // Behind the loading screen it starts at once; on a repeat visit or refresh (no loading screen) it
@@ -223,6 +223,7 @@ export function ArchitectureStory() {
             <div className="hero-ctas" data-intro="">
               <RegisterButton />
               <LiquidButton href={href('cfp')} variant="glass">Call for Papers</LiquidButton>
+              <LiquidButton href={href('events')} variant="glass">Call for Posters</LiquidButton>
             </div>
           </div>
           <Countdown />

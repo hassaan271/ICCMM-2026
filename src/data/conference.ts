@@ -30,13 +30,8 @@ export const links = {
   cmt: 'https://cmt3.research.microsoft.com/ICCMM2026',
   ieeeTemplates: 'https://www.ieee.org/conferences/publishing/templates',
   aiReportForm: 'https://forms.gle/hJTAHkTAThpgi4Zt6',
-  // INTEGRATION POINT (Google Form): the source mentions a "Conference Registration Form" but gives no URL.
-  // Set this to the live Google Form URL (e.g. the forms.gle link) and every registration button,
-  // including the form on the Registration page, switches to it automatically.
-  registrationForm: null as string | null,
-  // Optional: the Google Form's pre-fill field ids (Form menu → "Get pre-filled link"), e.g. 'entry.123456789'.
-  // When set, the Full Name and Mobile Number entered on the Registration page are carried into the Google Form.
-  registrationFormFields: { name: null as string | null, mobile: null as string | null },
+  // Official registration Google Form. Every "Register Now" button opens it in a new tab.
+  registrationForm: 'https://docs.google.com/forms/d/e/1FAIpQLSeQU0baMS7R8s1jRcGl2auaHZqHWJixniKEID-S6vCN8hynJw/viewform',
   maps: 'https://www.google.com/maps/search/?api=1&query=' +
     encodeURIComponent('Muffakham Jah College of Engineering and Technology, Road No. 3, Banjara Hills, Hyderabad 500034'),
   mapsEmbed: 'https://maps.google.com/maps?q=' +
@@ -500,7 +495,7 @@ export const committeeGuestIds: Record<string, string> = {
 };
 
 export const supporters = [
-  { role: 'Technically Sponsored by', name: 'IEEE Hyderabad Section', logo: 'assets/logos/logo-ieee-hyderabad-section.webp', w: 370, h: 128 },
+  { role: 'Technically Sponsored by', name: 'IEEE Hyderabad Section', logo: 'assets/logos/logo-ieee-hyderabad-section-ribbon.jpg', w: 588, h: 204 },
   { role: 'Technically Co-Sponsored by', name: 'SHODHGURU Research Labs', logo: 'assets/logos/logo-shodhguru.webp', w: 640, h: 178, dark: true },
   { role: 'Financially Supported by', name: 'AICTE', logo: 'assets/logos/logo-aicte.webp', w: 316, h: 316 },
   { role: 'Host Institution', name: 'Muffakham Jah College of Engineering and Technology', logo: 'assets/logos/logo-mjcet.webp', w: 900, h: 234 },
@@ -514,4 +509,14 @@ export const ieeeGallery = [
   { src: 'assets/images/ieee-sb-04', w: 1200, h: 798, alt: 'Group of students and faculty at an outdoor IEEE Student Branch activity' },
   { src: 'assets/images/ieee-sb-05', w: 1200, h: 900, alt: 'Students gathered for a group photograph under a tree during an IEEE activity' },
   { src: 'assets/images/ieee-sb-06', w: 1200, h: 900, alt: 'A presenter addressing students in a computer laboratory session' },
+  { src: 'assets/images/ieee-sb-07', w: 278, h: 252, alt: 'A guest being welcomed with a bouquet of flowers by faculty members' },
+  { src: 'assets/images/ieee-sb-08', w: 525, h: 274, alt: 'A guest lecturer receiving a memento from faculty at an IEEE lecture at MJCET' },
+  { src: 'assets/images/ieee-sb-09', w: 352, h: 261, alt: 'A speaker delivering a lecture from the podium in front of an IEEE MTT-S MJCET banner' },
+  { src: 'assets/images/ieee-sb-10', w: 621, h: 342, alt: 'Group photograph at the IEEE AP-S Distinguished Lecture in the MJCET seminar hall, organised by IEEE MTT-S MJCET SBC with the IEEE MTT-S/AP-S/EMC-S Joint Chapter, Hyderabad Section, on 13 December 2024' },
+  { src: 'assets/images/ieee-sb-11', w: 1186, h: 788, alt: 'A guest being honoured with a shawl at the Symposium for Research Encouragement among Students' },
+  { src: 'assets/images/ieee-sb-12', w: 346, h: 259, alt: 'Guests and faculty outdoors in front of the Symposium for Research Encouragement among Students banner' },
+  { src: 'assets/images/ieee-sb-13', w: 1192, h: 708, alt: 'Dignitaries standing at the dais during the Symposium for Research Encouragement among Students' },
+  { src: 'assets/images/ieee-sb-14', w: 1187, h: 792, alt: 'A speaker addressing the Symposium for Research Encouragement among Students from the podium, with guests seated at the dais' },
+  { src: 'assets/images/ieee-sb-15', w: 1200, h: 900, alt: 'Faculty holding the IEEE Day 2025 Awareness Program poster at the hands-on STEM workshop' },
+  { src: 'assets/images/ieee-sb-16', w: 1200, h: 900, alt: 'Students and faculty in a group photograph at the IEEE Day 2025 celebration organised by IEEE MTT-S MJCET SBC and IEEE RAS MJCET SBC' },
 ];

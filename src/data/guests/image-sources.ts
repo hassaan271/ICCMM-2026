@@ -45,7 +45,10 @@ export const guestImages: Record<string, GuestImage> = Object.fromEntries(([
   supplied('mgpl-narayana', 'image22.png', 720, 900, { verification: `${OK}; same photo in both tables` }),
   supplied('mohammed-waliullah', 'image18.png', 720, 900),
   supplied('zafar-javeed', 'image10.png', 720, 900),
-  supplied('marina-tropmann-frick', 'image13.png', 288, 360, { focus: '50% 30%' }),
+  {
+    guest: 'marina-tropmann-frick', status: 'organiser-supplied', source: 'HD photograph supplied directly by the ICCMM-26 organisers (Stage 9; replaces Guest Info image13.png)', sourceUrl: null,
+    license: LICENSE, attribution: null, verification: 'Supplied by the organisers as the portrait of Prof. Dr.-Ing. Marina Tropmann-Frick; matches the earlier Guest Info photo', w: 720, h: 900, focus: '50% 30%',
+  },
   supplied('merugu-lakshminarayana', 'image4.png', 160, 200, { lowRes: true }),
   supplied('syed-aamer-javeed', 'image12.png', 121, 151, { lowRes: true }),
   supplied('syed-omer-javeed', 'image1.png', 144, 180, { lowRes: true }),
@@ -59,8 +62,10 @@ export const guestImages: Record<string, GuestImage> = Object.fromEntries(([
   supplied('vijay-latha', 'image5.png', 400, 500),
   supplied('k-jaya-sankar', 'image15.png', 196, 245, { lowRes: true }),
   supplied('jyoti-singhai', 'image9.png', 409, 511),
-  missing('abhishek-ranjan'),
-  missing('krishna-reddy-p'),
+  {
+    guest: 'krishna-reddy-p', status: 'organiser-supplied', source: 'Photograph supplied directly by the ICCMM-26 organisers (Stage 8)', sourceUrl: null,
+    license: LICENSE, attribution: null, verification: 'Supplied by the organisers as the portrait of Prof. P. Krishna Reddy.', w: 520, h: 650, focus: '50% 35%',
+  },
 ] as GuestImage[]).map((i) => [i.guest, i]));
 
 export const portraitOf = (id: string) => {

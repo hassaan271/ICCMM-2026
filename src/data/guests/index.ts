@@ -1,9 +1,9 @@
 // Guests and speakers of ICCMM-26.
 // Sources (both supplied by the organisers):
-//   · "Guest Info.docx": names, designations, organisations, short bios, portraits
+//   · "Guest Info.pdf" (updated, Nov 2026; supersedes Guest Info.docx): names, designations, organisations, short bios, portraits
 //   · "Conference Schedule for Day1&2-29th Oct.docx": session roles (inaugural, keynote, chairs, panel, valedictory)
 // Rules applied:
-//   · Guests marked "NO" in Guest Info (J. Tanikella, S. Jasti, B. P. Peddigari) are not published.
+//   · Guests marked "NO" in Guest Info (S. Jasti, B. P. Peddigari) are not published.
 //   · `designation: null` renders as "Designation to be confirmed"; nothing is filled in from elsewhere.
 //   · Bios are reproduced from Guest Info; edits are listed in `notes` (only typo/name fixes).
 //   · Duplicates (M. G. P. L. Narayana in two tables) are consolidated into one profile.
@@ -37,7 +37,7 @@ export const guestCategories: { id: GuestCategory; title: string; accent: string
     id: 'inaugural',
     title: 'Inaugural',
     accent: 'session.',
-    intro: 'Chief guest, guests of honour and distinguished guests of the inaugural session on 20 November 2026.',
+    intro: 'Guests of honour, special guest and distinguished guests of the inaugural session on 20 November 2026.',
   },
   {
     id: 'ieee',
@@ -55,17 +55,6 @@ export const guestCategories: { id: GuestCategory; title: string; accent: string
 
 export const guests: Guest[] = [
   /* ───────── Inaugural session ───────── */
-  {
-    id: 'abhishek-ranjan',
-    honorific: 'Dr.',
-    name: 'Abhishek Ranjan',
-    designation: 'Innovation Officer',
-    organization: 'AICTE',
-    bio: null,
-    category: 'inaugural',
-    roles: [{ item: 'd1-inaugural', label: 'Chief Guest' }],
-    verify: ['Listed in the schedule only; no Guest Info entry, bio or portrait supplied.'],
-  },
   {
     id: 'mgpl-narayana',
     honorific: null,
@@ -124,23 +113,20 @@ export const guests: Guest[] = [
     bio: "Dr. Merugu Lakshminarayana is an experienced electronics and telecommunications professional with over 34 years of research and development experience at the Defence Electronics Research Laboratory (DRDO), Hyderabad. He previously served as Scientist 'H' and Associate Director at DLRL. He holds a PhD from Queen's University Belfast, UK, and has served as Chair of the IEEE Hyderabad Section.",
     category: 'inaugural',
     roles: [{ item: 'd1-inaugural', label: 'Distinguished Guest' }],
-    verify: [
-      'Guest Info also lists "Dr. Merugu Laxmi" (IEEE table) with the same role, a different portrait and a different bio. The schedule names Dr. Merugu Lakshminarayana, so only this entry is published; the "Merugu Laxmi" entry is held back until the organisers confirm whether it is a separate guest.',
-    ],
   },
   {
     id: 'krishna-reddy-p',
     honorific: 'Prof.',
-    name: 'Krishna Reddy P.',
-    designation: 'Professor',
-    organization: 'IIIT Hyderabad',
-    bio: null,
+    name: 'P. Krishna Reddy',
+    designation: 'Professor, Department of Computer Science',
+    organization: 'International Institute of Information Technology, Hyderabad (IIIT Hyderabad)',
+    bio: 'Prof. P. Krishna Reddy is an academic professional associated with the International Institute of Information Technology, Hyderabad (IIIT Hyderabad). He is involved in higher education and research, contributing to the academic and technological development of computer science disciplines. His association reflects a commitment to academic excellence and innovation.',
     category: 'inaugural',
     roles: [
       { item: 'd1-inaugural', label: 'Distinguished Guest' },
       { item: 'd1-keynote-1', label: 'Keynote Speaker' },
     ],
-    verify: ['Listed in the schedule only; no Guest Info entry, bio or portrait supplied.'],
+    verify: ['Bio in Guest Info opens with "Dr. P. Krishna Reddy"; shown as "Prof." to match the table heading.'],
   },
   {
     id: 'syed-aamer-javeed',
@@ -159,12 +145,12 @@ export const guests: Guest[] = [
     id: 'syed-omer-javeed',
     honorific: 'Mr.',
     name: 'Syed Omer Javeed',
-    designation: null,
+    designation: 'Member, Board of Governors (BoG)',
     organization: 'Sultan-ul-Uloom Educational Society',
     bio: 'Mr. Syed Omer Javeed is associated with Sultan-ul-Uloom Educational Society and serves as a member of the Governing Body of Muffakham Jah College of Engineering and Technology.',
     category: 'inaugural',
     roles: [{ item: 'd1-inaugural', label: 'Distinguished Guest' }],
-    verify: ['Guest Info: "Designation to be confirmed". The schedule lists "Treasurer, SUES". Not published until confirmed.'],
+    verify: ['Updated Guest Info lists "Distinguished Guest – Board of Governors (BoG)"; the schedule lists "Treasurer, SUES".'],
   },
 
   /* ───────── IEEE Hyderabad Section: dignitaries and guests ───────── */
@@ -199,7 +185,7 @@ export const guests: Guest[] = [
     id: 'moiz-m',
     honorific: 'Dr.',
     name: 'Moiz M.',
-    designation: null,
+    designation: 'Executive Committee (Execom) Member',
     organization: 'University of Hyderabad (UOH)',
     bio: 'Dr. Moiz M. is an academic professional associated with the University of Hyderabad. His academic involvement contributes to higher education, research and the advancement of knowledge across technical and interdisciplinary domains.',
     category: 'ieee',
@@ -213,14 +199,13 @@ export const guests: Guest[] = [
     id: 'c-thirmal',
     honorific: 'Dr.',
     name: 'C. Thirmal',
-    designation: null,
+    designation: 'Chair, IEEE Nanotechnology Council (NTC), Hyderabad',
     organization: 'VNR Vignana Jyothi Institute of Engineering and Technology (VNRVJIET)',
     bio: 'Dr. C. Thirmal is an academic professional associated with VNR Vignana Jyothi Institute of Engineering and Technology (VNRVJIET). He is involved in academic activities and the promotion of engineering education and research. His participation provides an opportunity to encourage academic interaction and knowledge sharing among students, researchers and professionals.',
     category: 'ieee',
     roles: [{ item: 'd1-track-3', label: 'Session Chair · Session 3' }],
     verify: [
       'Guest Info bio says "Dr. Thurman"; corrected to "Dr. C. Thirmal" to match the table and schedule.',
-      'Designation "to be confirmed" in Guest Info. The committee list on the site gives "Assistant Professor, Dept. of Physics, VNRVJIET; Chair, IEEE-NTC, Hyderabad Section". Not repeated here until confirmed.',
     ],
   },
 
@@ -228,29 +213,29 @@ export const guests: Guest[] = [
   {
     id: 'sridevi',
     honorific: 'Dr.',
-    name: 'Sridevi',
-    designation: null,
+    name: 'R. Sridevi',
+    designation: 'Professor, Department of CSE',
     organization: 'Jawaharlal Nehru Technological University Hyderabad (JNTUH)',
-    bio: "Dr. Sridevi is an academic professional associated with Jawaharlal Nehru Technological University Hyderabad (JNTUH). She is involved in academic activities and the advancement of technical education and research. Her participation reflects the university's commitment to fostering academic excellence and innovation.",
+    bio: "Dr. R. Sridevi is an academic professional associated with Jawaharlal Nehru Technological University Hyderabad (JNTUH). She is involved in academic activities and the advancement of technical education and research. Her participation reflects the university's commitment to fostering academic excellence and innovation.",
     category: 'academic',
     roles: [{ item: 'd1-track-1', label: 'Session Chair · Session 1' }],
-    verify: ['Single name only; please confirm the full name.'],
+    verify: ['Name corrected to "Dr. R. Sridevi" per organiser instruction (Stage 8).'],
   },
   {
     id: 'sanju-tiwari',
     honorific: 'Dr.',
     name: 'Sanju Tiwari',
-    designation: null,
+    designation: 'Professor, Department of CSE',
     organization: 'Sharda University',
     bio: 'Dr. Sanju Tiwari is a Professor at Sharda University, specializing in Computer Science and Applications. Her areas of expertise include Artificial Intelligence, Knowledge Graphs, Ontology Engineering and Semantic Web technologies. She is actively involved in academic research, international collaborations and advancing emerging technologies.',
     category: 'academic',
-    roles: [{ item: 'd2-parallel-b', label: 'Session Chair · Session 7' }],
+    roles: [{ item: 'd2-parallel-a', label: 'Session Chair · Session 7' }, { item: 'd2-parallel-b', label: 'Session Chair · Session 8' }],
   },
   {
     id: 'ma-jabbar',
     honorific: 'Dr.',
     name: 'M. A. Jabbar',
-    designation: null,
+    designation: 'Professor and HOD, Computer Science and Engineering (AI & ML)',
     organization: 'Vardhaman College of Engineering',
     bio: 'Dr. M. A. Jabbar is an academic professional associated with Vardhaman College of Engineering. He is involved in engineering education, academic development and research activities. His professional interests include promoting technical knowledge and encouraging innovation in higher education.',
     category: 'academic',
@@ -259,19 +244,19 @@ export const guests: Guest[] = [
   {
     id: 'vijay-latha',
     honorific: 'Dr.',
-    name: 'Vijay Latha',
-    designation: null,
+    name: 'Y. Vijayalatha Reddy',
+    designation: 'Professor and HOD, CSE',
     organization: 'Vardhaman College of Engineering',
-    bio: 'Dr. Vijay Latha is an academic professional associated with Vardhaman College of Engineering. She is engaged in academic activities and the advancement of engineering education and research. Her academic involvement focuses on fostering technical learning, research and professional development.',
+    bio: 'Dr. Y. Vijayalatha Reddy is an academic professional associated with Vardhaman College of Engineering. She is engaged in academic activities and the advancement of engineering education and research. Her academic involvement focuses on fostering technical learning, research and professional development.',
     category: 'academic',
-    roles: [{ item: 'd1-track-1', label: 'Session Chair · Session 2' }],
-    verify: ['Schedule spells the name "Dr. Vijayalata Reddy (VCE)". Please confirm the spelling.'],
+    roles: [{ item: 'd1-track-3', label: 'Session Chair · Session 2' }],
+    verify: ['Name corrected to "Dr. Y. Vijayalatha Reddy" per organiser instruction (Stage 8).'],
   },
   {
     id: 'k-jaya-sankar',
     honorific: 'Dr.',
     name: 'K. Jaya Sankar',
-    designation: null,
+    designation: 'Professor and Dean, Industry Partnerships & Outreach, ECE',
     organization: 'Methodist College of Engineering and Technology (MCET)',
     bio: 'Dr. K. Jaya Sankar is a Professor at Methodist College of Engineering and Technology (MCET), Hyderabad. His areas of expertise include Telecommunications, Electromagnetics, Antennas, Wireless Communications and Soft Computing. He has extensive experience in engineering education, academic administration and research.',
     category: 'academic',
@@ -282,11 +267,11 @@ export const guests: Guest[] = [
     id: 'jyoti-singhai',
     honorific: 'Dr.',
     name: 'Jyoti Singhai',
-    designation: null,
+    designation: 'Professor, Department of ECE',
     organization: 'National Institute of Technology (NIT) Bhopal',
     bio: 'Dr. Jyoti Singhai is an academic professional associated with the National Institute of Technology, Bhopal. She is involved in higher education and research, contributing to the academic and technological development of engineering disciplines. Her association reflects a commitment to academic excellence and innovation.',
     category: 'academic',
-    roles: [{ item: 'd2-parallel-b', label: 'Session Chair · Session 8' }],
+    roles: [{ item: 'd2-parallel-b', label: 'Session Chair · Session 9' }],
   },
 ];
 

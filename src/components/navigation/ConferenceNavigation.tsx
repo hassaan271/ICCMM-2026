@@ -18,6 +18,7 @@ export const navTree: Item[] = [
       { text: 'Technical Events & Posters', url: href('events'), note: 'Special Poster Session' },
     ],
   },
+  { text: 'Call for Posters', url: href('events'), key: 'posters' },
   { text: 'Tracks', url: href('tracks'), key: 'tracks' },
   { text: 'Speakers', url: href('speakers'), key: 'speakers' },
   { text: 'Guests', url: href('guests'), key: 'guests' },
@@ -37,7 +38,7 @@ export const navTree: Item[] = [
   { text: 'Venue', url: href('venue'), key: 'venue' },
 ];
 
-const currentKey: Partial<Record<PageKey, string>> = { home: 'home', about: 'about', tracks: 'tracks', speakers: 'speakers', guests: 'guests', programme: 'programme', cfp: 'cfp', events: 'cfp', registration: 'registration', sponsors: 'registration', committee: 'committee', venue: 'venue' };
+const currentKey: Partial<Record<PageKey, string>> = { home: 'home', about: 'about', tracks: 'tracks', speakers: 'speakers', guests: 'guests', programme: 'programme', cfp: 'cfp', events: 'posters', registration: 'registration', sponsors: 'registration', committee: 'committee', venue: 'venue' };
 
 export function ConferenceNavigation({ page }: { page: PageKey }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -113,7 +114,7 @@ export function ConferenceNavigation({ page }: { page: PageKey }) {
               <span className="brand-text"><span className="brand-name">ICCMM-26</span></span>
             </a>
             <span className="brand-divider" aria-hidden="true" />
-            <img className="brand-ieee" src="assets/logos/logo-ieee.webp" width={233} height={131} alt="IEEE" />
+            <img className="brand-ieee" src="assets/logos/logo-ieee-hyderabad-section-charminar.jpg" width={1600} height={552} alt="IEEE Hyderabad Section" decoding="async" />
           </div>
           <nav className="nav-main" aria-label="Primary">
             <span className="nav-goo" aria-hidden="true"><span ref={trail} className="nav-blob" /><span ref={lead} className="nav-blob" /></span>

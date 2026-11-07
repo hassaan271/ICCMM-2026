@@ -33,7 +33,8 @@ To add a page: create `<name>.html` (copy an existing one and change `data-page`
 - `src/data/conference.ts`: general content (meta, about, tracks, CFP, fees, committee, supporters).
 - `src/data/guests/index.ts`: guests and their programme roles. `src/data/guests/image-sources.ts` holds portrait files and rights status, kept separate from the bios.
 - `src/data/schedule.ts`: the Day 1 and Day 2 schedule.
-- `src/components/loading/boot-screen.html`: the loading screen. `vite.config.ts` injects it into every page, it shows once per browser session, and its progress bar tracks real milestones (fonts, app start, 3D scene ready on home, window load). It never waits more than 1.6 s after the app starts: the processor builds progressively behind the page (`processor/textures.ts` generates its surface maps in short slices, `Processor.tsx` uploads them and compiles shaders before fading the model in), and a WebGL failure falls back to the static stage backdrop.
+- `src/components/loading/boot-screen.html`: the loading screen (IEEE Hyderabad Section logo, conference name, a thin progress bar). `vite.config.ts` injects it into every page; the bar tracks real milestones (fonts, app start, window load) and it never waits more than 1.2 s after the app starts. The 3D processor builds progressively behind the page after it lifts (`processor/textures.ts`, `Processor.tsx`), and a WebGL failure falls back to the static stage backdrop.
+- `public/assets/docs/ICCMM-26-track-schedule.pdf`: the organisers' full track schedule, linked from the Programme page. Its sessions, rooms, chairs and papers are also in `src/data/schedule.ts`.
 - `src/components/guests/`: `Portrait` (4:5 crop with a placeholder plate), `GuestDialog`, role helpers.
 - `src/components/hero/`, `processor/`, `sections/`, `navigation/`, `footer/`, `glass/`, `buttons/`, `shared/`: home story, 3D model, home sections, layout, liquid-glass material, buttons, shared UI.
 - `src/animations/motion.ts`: smooth scroll, pointer, reveal/tilt/parallax/clip utilities, loader hand-off (`onBootDone`). `story.ts`: the scroll-story state and camera poses.
@@ -42,8 +43,7 @@ To add a page: create `<name>.html` (copy an existing one and change `data-page`
 
 ## Still to connect
 
-- `links.registrationForm` in `src/data/conference.ts`: the Google Form URL (none supplied yet). Optionally set `links.registrationFormFields` to the form's pre-fill ids so the Full Name and Mobile Number from the Registration page carry over.
 - Committee portraits: 30 members have a photo (2 supplied, 20 from mjcollege.ac.in, see `docs/committee-photo-sources.md`, and 8 reused guest portraits). Members from other institutions show a monogram placeholder until approved photos are supplied.
-- Guest consent for portraits, larger originals for the low-resolution ones, and photos for Dr. Abhishek Ranjan and Prof. Krishna Reddy P. (see `docs/guest-image-sources.md`).
+- Guest consent for portraits, larger originals for the low-resolution ones (see `docs/guest-image-sources.md`).
 - The open items in `docs/content-verification.md`.
 - The processor is a procedural model (no external GLB). A licensed GLB can replace `Processor.tsx` if preferred.
