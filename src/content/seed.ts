@@ -1850,7 +1850,8 @@ export const seed: SiteContent = {
               "role": "Distinguished Guest",
               "guest": "syed-omer-javeed"
             }
-          ]
+          ],
+          "pending": "Chief guest yet to be Confirmed"
         },
         {
           "id": "d1-tea-1",
@@ -1886,7 +1887,7 @@ export const seed: SiteContent = {
           "id": "d1-track-1",
           "start": "14:00",
           "end": "15:30",
-          "title": "Technical Session",
+          "title": "Technical Session 1",
           "kind": "technical",
           "lanes": [
             {
@@ -1954,7 +1955,7 @@ export const seed: SiteContent = {
           "id": "d1-track-3",
           "start": "15:30",
           "end": "17:00",
-          "title": "Technical Sessions",
+          "title": "Technical Session 2",
           "kind": "technical",
           "lanes": [
             {

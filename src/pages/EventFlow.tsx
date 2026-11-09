@@ -44,7 +44,7 @@ function Session({ l }: { l: Lane }) {
         {(l.room || l.online) && <div><dt>Room</dt><dd className="pg-session-v">{l.room ?? 'Online session'}</dd></div>}
         {l.chair && <div><dt>Chair</dt><dd><Who p={l.chair} showRole={false} /></dd></div>}
         {l.coChair && <div><dt>Co-chair</dt><dd><Who p={l.coChair} showRole={false} /></dd></div>}
-        {l.people && <div><dt>Presenters</dt><dd className="pg-session-people">{l.people.map((p) => <Who key={p.name} p={p} showRole={false} />)}</dd></div>}
+        {l.people && <div><dt>Judges</dt><dd className="pg-session-people">{l.people.map((p) => <Who key={p.name} p={p} showRole={false} />)}</dd></div>}
       </dl>
     </li>
   );
@@ -71,7 +71,7 @@ function Entry({ it }: { it: ScheduleItem }) {
     <>
       <p className="pg-kind">
         {[
-          // the category is left out where the title already says it (e.g. "Technical Sessions")
+          // the category is left out where the title already says it (e.g. "Technical Session 2")
           !it.title.toLowerCase().includes(kindLabel[it.kind].toLowerCase().replace(/s$/, '')) && kindLabel[it.kind],
           paperSessions(it) > 1 && `${paperSessions(it)} paper sessions in parallel`,
           dur(it.start, it.end),
